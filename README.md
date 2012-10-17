@@ -73,7 +73,7 @@ Using the `results` array returned by `<web_service>.query(q)`:
 Revision History
 ----------------
 
- + *Oct 2012* - Added gevent async support, courtesy of Kevin
+ + *Oct 2012* - Added `gevent` async support, courtesy of Kevin
  + *Oct 2012* - Added support for Bing, the new Google API and Flickr, updated to
                 new interface
  + *May 2011* - Updated Google web search method due to updates
