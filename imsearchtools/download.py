@@ -1,14 +1,13 @@
 #!/usr/bin/env python
 
-'''
-Created on 5 Nov 2010
+"""
+Module: image_download
+Author: Ken Chatfield <ken@robots.ox.ac.uk>
+Created on: 5 Nov 2010
 
-Module for downloading images from Google Image search
-given the response from calling doapiquery/dowebquery
-contained in the gimage_query module
-
-@author: Ken Chatfield
-'''
+Module for downloading images from search services provided by the
+image_query module
+"""
 
 import socket, urllib2
 import os
@@ -32,7 +31,7 @@ def __downloadURL(urldata, timeout=5):
     try:
         # skip if output file already exists
         if os.path.exists(urldata['filename']) == False:
-        	opener = urllib2.build_opener()
+            opener = urllib2.build_opener()
             opener.addheaders = [('User-agent','Mozilla/5.0')] # pretend to be firefox
             img = opener.open(urldata['url'], None, timeout)
             
@@ -90,10 +89,10 @@ def downimages(response, path, workers=10, status=None):
     
     urldata = []
     for result in response:
-        unused_fileroot, fileext = os.path.splitext(result['unescapedUrl'])
-        filename = result['imageId'] + fileext
+        unused_fileroot, fileext = os.path.splitext(result['url'])
+        filename = result['image_id'] + fileext
         filename = os.path.join(path,filename)
-        urldata.append({'url': result['unescapedUrl'],
+        urldata.append({'url': result['url'],
                         'filename': filename,
                         'status': status})  # this seems a bit hacky, but works
     
