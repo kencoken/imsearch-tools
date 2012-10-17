@@ -29,23 +29,25 @@ class GoogleAPISearch(restkit.Resource, SearchClient):
        there is no way to search the web without specifying a list of custom URLs **
     """
     
-    def __init__(self, **kwargs):
+    def __init__(self, async_query=True, timeout=5.0, **kwargs):
         super(GoogleAPISearch, self).__init__(GOOGLE_API_ENTRY, **kwargs)
 
         self._results_per_req = 10
-        self._supported_sizes_map = {'small': 'small',
-                                     'medium': 'medium',
-                                     'large': 'large'}
+        self._supported_sizes_map = {'small': 'medium',
+                                     'medium': 'large',
+                                     'large': 'xxlarge'}
         self._supported_styles_map = {'photo': 'photo',
                                       'graphics': 'clipart',
                                       'clipart': 'clipart',
                                       'lineart': 'lineart',
                                       'face': 'face',
                                       'news': 'news'}
+        self.async_query = async_query
+        self.timeout = timeout
 
-    def __fetch_results_from_offset(self, query, result_offset,
-                                    num_results=-1,
-                                    aux_params={}, headers={}):
+    def _fetch_results_from_offset(self, query, result_offset,
+                                   aux_params={}, headers={},
+                                   num_results=-1):
         if num_results == -1:
             num_results = self._results_per_req
         try:
@@ -72,14 +74,14 @@ class GoogleAPISearch(restkit.Resource, SearchClient):
                  'image_id': item['cacheId'],
                  'title': item['title']} for item in results
                 if (item.has_key('pagemap')
-                    and item['pagemap'].has_key('cse_iamge')
+                    and item['pagemap'].has_key('cse_image')
                     and item.has_key('cacheId'))]
 
     def __size_to_google_size(self, size):
-        return self._size_to_native_size(size, self._supported_sizes_map)
+        return self._size_to_native_size(size)
 
     def __style_to_google_style(self, style):
-        return self._style_to_native_style(style, self._supported_styles_map)
+        return self._style_to_native_style(style)
 
     @property
     def supported_sizes(self):
@@ -109,9 +111,6 @@ class GoogleAPISearch(restkit.Resource, SearchClient):
         # do request
         results = self._fetch_results(query,
                                       num_results,
-                                      self._results_per_req,
-                                      self.__fetch_results_from_offset,
-                                      aux_params=aux_params,
-                                      async_query=self.async_query)
+                                      aux_params=aux_params)
 
         return self.__google_results_to_results(results)

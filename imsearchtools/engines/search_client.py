@@ -13,54 +13,65 @@ class SearchClient(object):
 
         {'photo': 'Photo',
          'graphics': 'Graphics'} <-- LHS external property name, RHS internal name
+
+    Relies on the subclass having the properties:
+    - _supported_sizes_map
+    - _supported_styles_map
     """
 
-    def _size_to_native_size(self, size, supported_sizes_map):
+    def _size_to_native_size(self, size):
         if size == '':
             return size
-        if size not in supported_sizes_map:
+        if size not in self._supported_sizes_map:
             raise ValueError("Unsupported size '%s'" % size)
         else:
-            return supported_sizes_map[size]
+            return self._supported_sizes_map[size]
 
-    def _style_to_native_style(self, style, supported_styles_map):
+    def _style_to_native_style(self, style):
         if style == '':
             return style
-        if style not in supported_styles_map:
+        if style not in self._supported_styles_map:
             raise ValueError("Unsupported style '%s'" % style)
         else:
-            return supported_styles_map[style]
+            return self._supported_styles_map[style]
     
-    def _fetch_results(self, query, num_results, results_per_req,
-                       fetch_results_from_offset_func,
+    def _fetch_results(self, query, num_results,
                        aux_params={},
-                       headers={},
-                       async_query=True):
+                       headers={}):
         """Routine for fetching results from server using multiple requests.
 
         Parameters:
         - query
             the text query
         - num_results
-            the number of results to return for this query
-        - results_per_req
-            the number of results to return for general requests (from class property)
+            the number of results to return for this query - may be ignored
         - fetch_results_from_offset_func
             the function to be called to retrieve results for a given subset of results
             should be of the form:
                 func(self, query, result_offset[, num_results, aux_params, headers])
         - [aux_params, headers]
             optional parameter/header arguments
-        - [async_query=True]
+
+        Relies on the following parameters being defined in the subclass:
+        - _results_per_req
+            number of results to return for generic requests to the server
+        - async_query
             perform function asynchronously or not
+        - timeout
+            timeout of each request in seconds
+
+        And the following function being defined in the class:
+          def _fetch_results_from_offset(self, query, result_offset,
+                                         aux_params={}, headers={},
+                                         num_results=-1)
         """
-        if async_query:
-            jobs = [gevent.spawn(fetch_results_from_offset_func,
+        if self.async_query:
+            jobs = [gevent.spawn(self._fetch_results_from_offset,
                                  query, result_offset,
                                  aux_params=aux_params,
                                  headers=headers,
                                  num_results=num_results)
-                    for result_offset in range(0, num_results, results_per_req)]
+                    for result_offset in range(0, num_results, self._results_per_req)]
 
             gevent.joinall(jobs, timeout=self.timeout)
 
@@ -72,11 +83,11 @@ class SearchClient(object):
         else:
             results = []
 
-            for result_offset in range(0, num_results, results_per_req):
-                results.extend(fetch_results_from_offset_func(query,
-                                                              result_offset,
-                                                              aux_params=aux_params,
-                                                              headers=headers,
-                                                              num_results=num_results))
+            for result_offset in range(0, num_results, self._results_per_req):
+                results.extend(self._fetch_results_from_offset(query,
+                                                               result_offset,
+                                                               aux_params=aux_params,
+                                                               headers=headers,
+                                                               num_results=num_results))
         
         return results

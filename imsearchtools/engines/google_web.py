@@ -29,7 +29,7 @@ class GoogleWebSearch(restkit.Resource, SearchClient):
     Created November 2010, Updated May 2011, confirmed working October 2012.
     """
     
-    def __init__(self, async_query=True, timeout=10.0, **kwargs):
+    def __init__(self, async_query=True, timeout=5.0, **kwargs):
         super(GoogleWebSearch, self).__init__(GOOGLE_WEB_ENTRY, **kwargs)
 
         self._results_per_req = 20
@@ -44,9 +44,9 @@ class GoogleWebSearch(restkit.Resource, SearchClient):
         self.async_query = async_query
         self.timeout = timeout
 
-    def __fetch_results_from_offset(self, query, result_offset,
-                                    num_results=-1,
-                                    aux_params={}, headers={}):
+    def _fetch_results_from_offset(self, query, result_offset,
+                                   aux_params={}, headers={},
+                                   num_results=-1):
         if num_results == -1:
             num_results = self._results_per_req
         image_url_pattern = re.compile(r'/imgres\?imgurl=(.*?)&')
@@ -72,10 +72,10 @@ class GoogleWebSearch(restkit.Resource, SearchClient):
             return []
 
     def __size_to_google_size(self, size):
-        return self._size_to_native_size(size, self._supported_sizes_map)
+        return self._size_to_native_size(size)
 
     def __style_to_google_style(self, style):
-        return self._style_to_native_style(style, self._supported_styles_map)
+        return self._style_to_native_style(style)
 
     @property
     def supported_sizes(self):
@@ -108,11 +108,8 @@ class GoogleWebSearch(restkit.Resource, SearchClient):
         # do request
         results = self._fetch_results(query,
                                       num_results,
-                                      self._results_per_req,
-                                      self.__fetch_results_from_offset,
                                       aux_params=aux_params,
-                                      headers=headers,
-                                      async_query=self.async_query)
+                                      headers=headers)
 
         return results
     

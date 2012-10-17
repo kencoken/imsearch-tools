@@ -26,7 +26,7 @@ class GoogleOldAPISearch(restkit.Resource, SearchClient):
     ** NOTE: As of 26 May 2011 the Image Search API has been deprecated **
     """
     
-    def __init__(self, **kwargs):
+    def __init__(self, async_query=True, timeout=5.0, **kwargs):
         super(GoogleOldAPISearch, self).__init__(GOOGLE_OLD_API_ENTRY, **kwargs)
 
         self._results_per_req = 8
@@ -38,10 +38,12 @@ class GoogleOldAPISearch(restkit.Resource, SearchClient):
                                       'clipart': 'clipart',
                                       'lineart': 'lineart',
                                       'face': 'face'}
+        self.async_query = async_query
+        self.timeout = timeout
 
-    def __fetch_results_from_offset(self, query, result_offset,
-                                    num_results=-1,
-                                    aux_params={}, headers={}):
+    def _fetch_results_from_offset(self, query, result_offset,
+                                   aux_params={}, headers={},
+                                   num_results=-1):
         if num_results == -1:
             num_results = self._results_per_req
         try:
@@ -69,10 +71,10 @@ class GoogleOldAPISearch(restkit.Resource, SearchClient):
                  'title': item['titleNoFormatting']} for item in results]
 
     def __size_to_google_size(self, size):
-        return self._size_to_native_size(size, self._supported_sizes_map)
+        return self._size_to_native_size(size)
 
     def __style_to_google_style(self, style):
-        return self._style_to_native_style(style, self._supported_styles_map)
+        return self._style_to_native_style(style)
 
     @property
     def supported_sizes(self):
@@ -105,10 +107,7 @@ class GoogleOldAPISearch(restkit.Resource, SearchClient):
         # do request
         results = self._fetch_results(query,
                                       num_results,
-                                      self._results_per_req,
-                                      self.__fetch_results_from_offset,
-                                      aux_params=aux_params,
-                                      async_query=self.async_query)
+                                      aux_params=aux_params)
 
         return self.__google_results_to_results(results)
     

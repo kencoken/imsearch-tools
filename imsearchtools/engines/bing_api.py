@@ -24,7 +24,7 @@ class BingAPISearch(restkit.Resource, SearchClient):
     http://www.bing.com/developers/
     """
 
-    def __init__(self, async_query=True, timeout=10.0, **kwargs):
+    def __init__(self, async_query=True, timeout=5.0, **kwargs):
         auth = restkit.BasicAuth('', BING_API_KEY)
         super(BingAPISearch, self).__init__(BING_API_ENTRY, filters=[auth], **kwargs)
 
@@ -37,20 +37,21 @@ class BingAPISearch(restkit.Resource, SearchClient):
         self.async_query = async_query
         self.timeout = timeout
 
-    def __fetch_results_from_offset(self, query, result_offset,
-                                    num_results = -1,
-                                    aux_params={}, headers={}):
+    def _fetch_results_from_offset(self, query, result_offset,
+                                   aux_params={}, headers={},
+                                   num_results=-1):
         if num_results == -1:
             num_results = self._results_per_req
+            
         try:
             quoted_query = "'%s'" % query
-            
+
             req_result_count = min(self._results_per_req, num_results-result_offset)
 
             # add query position to auxilary parameters
             aux_params['$skip'] = result_offset
             aux_params['$top'] = req_result_count
-            
+
             resp = self.get(BING_API_FUNC, params_dict=aux_params,
                             headers=headers,
                             Query=quoted_query)
@@ -68,10 +69,10 @@ class BingAPISearch(restkit.Resource, SearchClient):
                  'title': item['Title']} for item in results]
 
     def __size_to_bing_size(self, size):
-        return self._size_to_native_size(size, self._supported_sizes_map)
+        return self._size_to_native_size(size)
 
     def __style_to_bing_style(self, style):
-        return self._style_to_native_style(style, self._supported_styles_map)
+        return self._style_to_native_style(style)
 
     @property
     def supported_sizes(self):
@@ -90,7 +91,7 @@ class BingAPISearch(restkit.Resource, SearchClient):
         if size:
             image_filters_list.append('Size:%s' % size)
         if style:
-            image_filters_list.append('Style%s' % style)
+            image_filters_list.append('Style:%s' % style)
         image_filters = '+'.join(image_filters_list)
         quoted_image_filters = None # of form: 'Size=<size>+Style=<style>'
         if image_filters:
@@ -107,10 +108,7 @@ class BingAPISearch(restkit.Resource, SearchClient):
         # do request
         results = self._fetch_results(query,
                                       num_results,
-                                      self._results_per_req,
-                                      self.__fetch_results_from_offset,
-                                      aux_params=aux_params,
-                                      async_query=self.async_query)
+                                      aux_params=aux_params)
 
         return self.__bing_results_to_results(results)
     

@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
-from imsearch_tools import query as image_query
-from imsearch_tools.utils import result_page_gen
+from imsearchtools import query as image_query
+from imsearchtools.utils import result_page_gen
 import time
 import sys
 
@@ -56,7 +56,7 @@ if test_google_api:
     google_api_searcher = image_query.GoogleAPISearch()
     print 'Executing Google API Search (Custom Search)...'
     t = time.time()
-    google_api_results = google_api_searcher.query(test_query_str, num_results=40)
+    google_api_results = google_api_searcher.query(test_query_str)
     google_api_timing = time.time() - t
     print 'Retrieved %d results in %f seconds' % (len(google_api_results), google_api_timing)
 
@@ -75,9 +75,6 @@ if test_google_web:
     google_web_results = google_web_searcher.query(test_query_str)
     google_web_timing = time.time() - t
     print 'Retrieved %d results in %f seconds' % (len(google_web_results), google_web_timing)
-
-    import pprint
-    pprint.pprint(google_web_results)
 
     result_page_gen.gen_results_page(google_web_results,
                                        'GoogleWebSearch()',
