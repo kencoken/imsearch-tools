@@ -70,12 +70,12 @@ class GoogleAPISearch(restkit.Resource, SearchClient):
             return []
         
     def __google_results_to_results(self, results):
-        return [{'url': item['pagemap']['cse_image'][0]['src'],
-                 'image_id': item['cacheId'],
-                 'title': item['title']} for item in results
-                if (item.has_key('pagemap')
-                    and item['pagemap'].has_key('cse_image')
-                    and item.has_key('cacheId'))]
+        import pprint
+        pprint.pprint(results)
+        
+        return [{'url': item['link'],
+                 'image_id': 'a',
+                 'title': item['title']} for item in results]
 
     def __size_to_google_size(self, size):
         return self._size_to_native_size(size)
@@ -102,7 +102,8 @@ class GoogleAPISearch(restkit.Resource, SearchClient):
 
         # prepare auxilary parameter list
         aux_params = {'cx': GOOGLE_API_CX,
-                      'key': GOOGLE_API_KEY}
+                      'key': GOOGLE_API_KEY,
+                      'searchType': 'image'}
         if size:
             aux_params['imgSize'] = size
         if style:
