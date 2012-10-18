@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 import restkit
+import md5
 
 try:
     import simplejson as json
@@ -65,7 +66,7 @@ class BingAPISearch(restkit.Resource, SearchClient):
 
     def __bing_results_to_results(self, results):
         return [{'url': item['MediaUrl'],
-                 'image_id': item['ID'],
+                 'image_id': md5.new(item['ID']).hexdigest(),
                  'title': item['Title']} for item in results]
 
     def __size_to_bing_size(self, size):

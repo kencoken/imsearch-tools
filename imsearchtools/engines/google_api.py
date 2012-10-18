@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 import restkit
+import md5
 
 try:
     import simplejson as json
@@ -69,12 +70,9 @@ class GoogleAPISearch(restkit.Resource, SearchClient):
         except restkit.errors.RequestError:
             return []
         
-    def __google_results_to_results(self, results):
-        import pprint
-        pprint.pprint(results)
-        
+    def __google_results_to_results(self, results):        
         return [{'url': item['link'],
-                 'image_id': 'a',
+                 'image_id': md5.new(item['link']).hexdigest(),
                  'title': item['title']} for item in results]
 
     def __size_to_google_size(self, size):

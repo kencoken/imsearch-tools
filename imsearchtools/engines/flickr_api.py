@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 import restkit
+import md5
 
 try:
     import simplejson as json
@@ -75,7 +76,7 @@ class FlickrAPISearch(restkit.Resource, SearchClient):
                                               item['id'],
                                               item['secret'],
                                               size),
-                 'image_id': item['id'],
+                 'image_id': md5.new(item['id']).hexdigest(),
                  'title': item['title']} for item in results]
 
     def __size_to_flickr_size(self, size):

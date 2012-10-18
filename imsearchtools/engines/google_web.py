@@ -2,6 +2,7 @@
 
 import restkit
 import re
+import md5
 
 try:
     import simplejson as json
@@ -65,7 +66,7 @@ class GoogleWebSearch(restkit.Resource, SearchClient):
             image_ids = image_id_pattern.findall(resp_str)
 
             resp_dict = [{'url': item[0],
-                          'image_id': item[1]} for item in zip(image_urls, image_ids)]
+                          'image_id': md5.new(item[1]).hexdigest()} for item in zip(image_urls, image_ids)]
 
             return resp_dict
         except restkit.errors.RequestError:
