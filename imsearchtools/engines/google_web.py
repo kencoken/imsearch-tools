@@ -71,25 +71,11 @@ class GoogleWebSearch(restkit.Resource, SearchClient):
             return resp_dict
         except restkit.errors.RequestError:
             return []
-
-    def __size_to_google_size(self, size):
-        return self._size_to_native_size(size)
-
-    def __style_to_google_style(self, style):
-        return self._style_to_native_style(style)
-
-    @property
-    def supported_sizes(self):
-        return self._supported_sizes_map.keys()
-
-    @property
-    def supported_styles(self):
-        return self._supported_styles_map.keys()
         
     def query(self, query, size='medium', style='photo', num_results=100):
         # prepare query parameters
-        size = self.__size_to_google_size(size)
-        style = self.__style_to_google_style(style)
+        size = self._size_to_native_size(size)
+        style = self._style_to_native_style(style)
 
         # prepare auxilary parameters (contained in tbs)
         tbs_list = []

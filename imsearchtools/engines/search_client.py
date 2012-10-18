@@ -19,6 +19,14 @@ class SearchClient(object):
     - _supported_styles_map
     """
 
+    @property
+    def supported_sizes(self):
+        return self._supported_sizes_map.keys()
+
+    @property
+    def supported_styles(self):
+        return self._supported_styles_map.keys()
+    
     def _size_to_native_size(self, size):
         if size == '':
             return size

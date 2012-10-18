@@ -79,23 +79,9 @@ class FlickrAPISearch(restkit.Resource, SearchClient):
                  'image_id': md5(item['id']).hexdigest(),
                  'title': item['title']} for item in results]
 
-    def __size_to_flickr_size(self, size):
-        return self._size_to_native_size(size)
-
-    def __style_to_flickr_style(self, style):
-        return self._style_to_native_style(style)
-
-    @property
-    def supported_sizes(self):
-        return self._supported_sizes_map.keys()
-
-    @property
-    def supported_styles(self):
-        return self._supported_styles_map.keys()
-
     def query(self, query, size='medium', num_results=100):
         # prepare query parameters
-        size = self.__size_to_flickr_size(size)
+        size = self._size_to_native_size(size)
         
         # prepare auxilary parameter list
         aux_params = {'method': FLICKR_API_METHOD,

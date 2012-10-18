@@ -75,28 +75,14 @@ class GoogleAPISearch(restkit.Resource, SearchClient):
                  'image_id': md5(item['link']).hexdigest(),
                  'title': item['title']} for item in results]
 
-    def __size_to_google_size(self, size):
-        return self._size_to_native_size(size)
-
-    def __style_to_google_style(self, style):
-        return self._style_to_native_style(style)
-
-    @property
-    def supported_sizes(self):
-        return self._supported_sizes_map.keys()
-
-    @property
-    def supported_styles(self):
-        return self._supported_styles_map.keys()
-
     def query(self, query, size='medium', style='photo', num_results=100):
         # check input
         if num_results > 100:
             raise ValueError('Google API currently allows for a maximum of 100 results to be returend')
         
         # prepare query parameters
-        size = self.__size_to_google_size(size)
-        style = self.__style_to_google_style(style)
+        size = self._size_to_native_size(size)
+        style = self._style_to_native_style(style)
 
         # prepare auxilary parameter list
         aux_params = {'cx': GOOGLE_API_CX,
