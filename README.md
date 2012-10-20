@@ -1,7 +1,10 @@
 Web Image Downloader Tools
 ============================================
 
-Author: Ken Chatfield, University of Oxford – <ken@robots.ox.ac.uk>
+Authors:
+
+ + Ken Chatfield, University of Oxford – <ken@robots.ox.ac.uk>
+ + Kevin McGuinness, Dublin City University – <kevin.mcguinness@eeng.dcu.ie>
 
 Copyright 2010-2012, all rights reserved.
 
@@ -11,22 +14,27 @@ Installation Instructions
      - `gevent`
      - `restkit`
      - `pil` (Python Imaging Library)
+     - `numpy`
+     - `scipy`
  + Add `imsearchtools` directory to your `PYTHON_PATH`
  + Update `authentication.py` in the `/imsearchtools/engines/api_credentials` directory
-   with appropriate API keys for each method (see section below for how to obtain keys)
+   with appropriate API keys for each method (see section below for how to obtain keys –
+   note some default keys are provided, but it would be greatly appreciated if you could
+   generate your own if using any of the API functions, as they are linked to my personal
+   accounts *-Ken*)
    
 Usage Instructions
 ------------------
 
-#### 1. Querying web engine for image URLs
+### 1. Querying web engine for image URLs
 
     >> import imsearchtools
     >> google_searcher = imsearchtools.query.GoogleWebSearch()
     >> results = google_searcher.query('car')
     >> results
-    [{'image_id': 'ANd9GcTfVgJYjlinlqyLfOyUEkPutMMSeyrMErTrTtLDhYCDlTP-4RnKIiQ4knE',
+    [{'image_id': '43e9644258865f9eedacf08e73f552fa',
       'url': 'http://asset3.cbsistatic.com/cnwk.1d/i/tim/2012/09/19/35446285_620x433.jpg'},
-     {'image_id': 'ANd9GcQGcCEBC2WZlDnPjxDDJ_prdEPYlSWTqAYmIsIFIk7RYvtEmrGPsB5B2NI',
+     {'image_id': 'cfd0ae160c4de2ebbd4b71fd9254d6df',
       'url': 'http://asset0.cbsistatic.com/cnwk.1d/i/tim/2012/08/15/35414204_620x433.jpg'},
      … ]
      
@@ -59,23 +67,75 @@ Currently the following search services are supported:
        <http://www.flickr.com/services/api/>
        
 A test script `query_test.py` is provided which can be used to visualize the difference
-between the methods. Run it by issuing:
+between the methods:
 
     $ python query_test.py <query>
 
-#### 2. Downloading retrieved image URLs
+### 2. Verifying and downloading retrieved image URLs
 
-Using the `results` array returned by `<web_service>.query(q)`:
+Given the `results` array returned by `<web_service>.query(q)`, all URLs can be processed
+and downloaded to local storage using the `process.ImageGetter()` class:
 
     ...
-    >> imsearchtools.downimages(results, '/path/to/save/images')
+    >> getter = imsearchtools.process.ImageGetter()
+    >> paths = getter.process_urls(results, '/path/to/save/images')
+    >> paths
+    [{'clean_fn': '/path/43e9644258865f9eedacf08e73f552fa-clean.jpg',
+      'image_id': '43e9644258865f9eedacf08e73f552fa',
+      'orig_fn': '/path/43e9644258865f9eedacf08e73f552fa.jpg',
+      'thumb_fn': '/path/43e9644258865f9eedacf08e73f552fa-thumb-90x90.jpg',
+      'url': 'http://asset3.cbsistatic.com/cnwk.1d/i/tim/2012/09/19/35446285_620x433.jpg'},
+     {'clean_fn': '/path/cfd0ae160c4de2ebbd4b71fd9254d6df-clean.jpg',
+      'image_id': 'cfd0ae160c4de2ebbd4b71fd9254d6df',
+      'orig_fn': '/path/cfd0ae160c4de2ebbd4b71fd9254d6df.jpg',
+      'thumb_fn': '/path/cfd0ae160c4de2ebbd4b71fd9254d6df-thumb-90x90.jpg',
+      'url': 'http://asset0.cbsistatic.com/cnwk.1d/i/tim/2012/08/15/35414204_620x433.jpg'},
+      … ]
+
+`process_urls` returns a list of dictionaries, with each dictionary containing details of
+images which were successfully downloaded:
+
+ + `url` is the source URL for the image, the same as returned from `<web_service>.query(q)`
+ + `image_id` is a unique identifier for the image, the same as returned from
+   `<web_service>.query(q)`
+ + `orig_fn` is the path of the original file downloaded direct from `url` – this image is
+   unverified, and depending on the source URL may be corrupt
+ + `clean_fn` is the path to a verified copy of `orig_fn`, which has been standardized
+   according to the class options
+ + `thumb_fn` is the path to a thumbnail version of `orig_fn`
+ 
+A test script `download_test.py` is provided which can be used to demonstrate the usage of
+the `process.ImageGetter()` class:
+
+    $ python download_test.py
+    
+#### Configuring verification and download settings
+
+Options for image verification and thumbnail generation can be customized by passing an
+instance of the `process.ImageProcessorSettings` class to `process.ImageGetter()` during
+initialization e.g.:
+
+    >> opts = imsearchtools.process.ImageProcessorSettings()
+    >> opts.filter['max_height'] = 600   # set maximum image size to 800x600
+    >> opts.filter['max_width'] = 800    #    (discarding larger images)
+    >> opts.conversion['format'] = 'png' # change output format
+    >> opts.thumbnail['height'] = 50     # change width and height of thumbnails to 50x50
+    >> opts.thumbnail['width'] = 50
+    >> opts.thumbnail['pad_to_size'] = False # don't add padding to thumbnails
+    >> getter = imsearchtools.process.ImageGetter(opts)
+    
+
     
 Revision History
 ----------------
 
- + *Oct 2012* - Added `gevent` async support, courtesy of Kevin
- + *Oct 2012* - Added support for Bing, the new Google API and Flickr, updated to
-                new interface
- + *May 2011* - Updated Google web search method due to updates
- + *Nov 2010* - Original version with support for Google Image Search API + scraping
+ + *Oct 2012*
+     - Added support for Bing, the new Google API and Flickr, updated to new interface
+     - Added `gevent` async support
+     - Updated code for downloading and verification of images
+     - Added documentation
+ + *May 2011*
+     - Updated Google web search method due to updates
+ + *Nov 2010*
+     - Original version with support for Google Image Search API + scraping
  

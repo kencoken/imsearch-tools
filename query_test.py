@@ -4,18 +4,23 @@ from imsearchtools import query as image_query
 from imsearchtools.utils import result_page_gen
 import time
 import sys
+import os
 
 if len(sys.argv) < 2:
     test_query_str = 'car'
 else: test_query_str = sys.argv[1]
 
-test_bing_api = True
-test_google_old_api = True
-test_google_api = True
-test_google_web = True
-test_flickr_api = True
+outdir = os.path.join(os.getcwd(), 'demos')
+if not os.path.isdir(outdir):
+    os.makedirs(outdir)
 
-display_results = True
+test_bing_api = True
+test_google_old_api = False
+test_google_api = False
+test_google_web = False
+test_flickr_api = False
+
+display_results = False
 
 all_results = []
 all_generator_names = []
@@ -30,7 +35,7 @@ if test_bing_api:
 
     result_page_gen.gen_results_page(bing_api_results,
                                        'BingAPISearch()',
-                                       'bing_api_results.html',
+                                       os.path.join(outdir, 'bing_api_results.html'),
                                        show_in_browser=False)
 
     all_results.append(bing_api_results)
@@ -46,7 +51,7 @@ if test_google_old_api:
 
     result_page_gen.gen_results_page(google_old_api_results,
                                        'GoogleOldAPISearch()',
-                                       'google_old_api_results.html',
+                                       os.path.join(outdir, 'google_old_api_results.html'),
                                        show_in_browser=False)
 
     all_results.append(google_old_api_results)
@@ -62,7 +67,7 @@ if test_google_api:
 
     result_page_gen.gen_results_page(google_api_results,
                                        'GoogleAPISearch()',
-                                       'google_api_results.html',
+                                       os.path.join(outdir, 'google_api_results.html'),
                                        show_in_browser=False)
 
     all_results.append(google_api_results)
@@ -78,7 +83,7 @@ if test_google_web:
 
     result_page_gen.gen_results_page(google_web_results,
                                        'GoogleWebSearch()',
-                                       'google_web_results.html',
+                                       os.path.join(outdir, 'google_web_results.html'),
                                        show_in_browser=False)
 
     all_results.append(google_web_results)
@@ -95,7 +100,7 @@ if test_flickr_api:
 
     result_page_gen.gen_results_page(flickr_api_results,
                                        'FlickrApiSearch()',
-                                       'flickr_api_results.html',
+                                       os.path.join(outdir, 'flickr_api_results.html'),
                                        show_in_browser=False)
 
     all_results.append(flickr_api_results)
@@ -103,4 +108,4 @@ if test_flickr_api:
 
 if display_results:
     result_page_gen.combine_results_pages(all_results, all_generator_names,
-                                            'combined_results.html')
+                                            os.path.join(outdir, 'combined_results.html'))

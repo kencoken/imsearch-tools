@@ -6,17 +6,28 @@ import gevent
 #  --------------------------------------------
 
 class SearchClient(object):
-    """Base class for search clients providing some utility methods for
-    converting input properties to the internal property names required
-    for the current search type using a map, which should be provided by
-    the subclass and be of the form e.g. for styles:
+    """Base class for all search clients, providing utility methods common
+    to all classes. Requires the subclass to define the following:
 
-        {'photo': 'Photo',
-         'graphics': 'Graphics'} <-- LHS external property name, RHS internal name
-
-    Relies on the subclass having the properties:
-    - _supported_sizes_map
-    - _supported_styles_map
+    PROPERTIES:
+     + _supported_sizes_map (Dict)
+          mapping of external supported sizes to internal (API) supported sizes
+          e.g. {'large': 'xxlarge', 'medium': 'xlarge|large|medium', 'small': 'small'}
+     + _supported_styles_map (Dict)
+          mapping of external supported styles to internal (API) supported styles
+          e.g. {'photo': 'Photo', 'graphics': 'Graphics'}
+     + _results_per_req (Integer)
+          maximum number of queries to make per request, normally defined by the API
+     + async_query (Bool)
+          make queries asynchronously or not
+     + timeout (Float)
+          timeout in seconds for HTTP requests
+    METHODS:
+     + def _fetch_results_from_offset(self, query, result_offset,
+                                      aux_params={}, headers={},
+                                      num_results=-1)
+          this method should return a set of results given an offset from the
+          first result and a count of results to return
     """
 
     @property
@@ -59,19 +70,6 @@ class SearchClient(object):
                 func(self, query, result_offset[, num_results, aux_params, headers])
         - [aux_params, headers]
             optional parameter/header arguments
-
-        Relies on the following parameters being defined in the subclass:
-        - _results_per_req
-            number of results to return for generic requests to the server
-        - async_query
-            perform function asynchronously or not
-        - timeout
-            timeout of each request in seconds
-
-        And the following function being defined in the class:
-          def _fetch_results_from_offset(self, query, result_offset,
-                                         aux_params={}, headers={},
-                                         num_results=-1)
         """
         if self.async_query:
             jobs = [gevent.spawn(self._fetch_results_from_offset,

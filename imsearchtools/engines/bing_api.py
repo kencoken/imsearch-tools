@@ -47,11 +47,15 @@ class BingAPISearch(restkit.Resource, SearchClient):
         try:
             quoted_query = "'%s'" % query
 
+            print quoted_query
+            print BING_API_FUNC
+
             req_result_count = min(self._results_per_req, num_results-result_offset)
 
             # add query position to auxilary parameters
             aux_params['$skip'] = result_offset
             aux_params['$top'] = req_result_count
+            print aux_params
 
             resp = self.get(BING_API_FUNC, params_dict=aux_params,
                             headers=headers,
@@ -59,9 +63,11 @@ class BingAPISearch(restkit.Resource, SearchClient):
 
             # extract list of results from response
             result_dict = json.loads(resp.body_string())
+            print json.dumps(result_dict)
 
             return result_dict['d']['results']
-        except restkit.errors.RequestError:
+        except restkit.errors.RequestError, e:
+            print str(e)
             return []
 
     def __bing_results_to_results(self, results):
