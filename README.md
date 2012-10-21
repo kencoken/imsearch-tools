@@ -146,9 +146,11 @@ do this, specify the callback when calling `process_urls()`:
                         completion_worker_count=8)
                         
 The form of the callback should be `f(out_dict)` where `out_dict` is a dictionary of the
-same form as a single entry in the list returned from `process_urls()`. If
-`completion_worker_count` is not specified, by default N workers are launched where N is
-equal to the number of CPUs on the local system.
+same form as a single entry in the list returned from `process_urls()`.
+
+The callbacks will be executed using a pool of worker processes, the size of which is
+determined by the `completion_worker_count` parameter. If it is not specified, by default
+*N* workers will be launched where *N* is the number of CPUs on the local system.
     
     
 Revision History
