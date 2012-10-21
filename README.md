@@ -124,7 +124,32 @@ initialization e.g.:
     >> opts.thumbnail['pad_to_size'] = False # don't add padding to thumbnails
     >> getter = imsearchtools.process.ImageGetter(opts)
     
+#### Adding a callback for post image download
 
+Optionally, a callback function can be added which will be called immediately after each
+image is downloaded and processed when using `process.ImageGetter.process_urls()`. To
+do this, specify the callback when calling `process_urls()`:
+
+    import imsearchtools
+    
+    def callback_func(out_dict):
+        import json
+        print json.dumps(out_dict)
+        sleep(0.1)
+    
+    google_searcher = imsearchtools.query.GoogleWebSearch()
+    results = google_searcher.query('car')
+    
+    getter = imsearchtools.process.ImageGetter()
+    getter.process_urls(results, '/path/to/save/images',
+                        completion_func=callback_func,
+                        completion_worker_count=8)
+                        
+The form of the callback should be `f(out_dict)` where `out_dict` is a dictionary of the
+same form as a single entry in the list returned from `process_urls()`. If
+`completion_worker_count` is not specified, by default N workers are launched where N is
+equal to the number of CPUs on the local system.
+    
     
 Revision History
 ----------------

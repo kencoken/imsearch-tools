@@ -5,6 +5,12 @@ import time
 import sys
 import os
 
+
+def test_callback(out_dict):
+    import json
+    print json.dumps(out_dict)
+    time.sleep(0.2)
+
 if len(sys.argv) < 2:
     test_query_str = 'car'
 else: test_query_str = sys.argv[1]
@@ -21,6 +27,6 @@ t = time.time()
 outdir = os.path.join(os.getcwd(), 'demos', 'downloaded_images')
 if not os.path.isdir(outdir):
     os.makedirs(outdir)
-output_fns = imgetter.process_urls(results, outdir)
+output_fns = imgetter.process_urls(results, outdir, test_callback)
 print 'Retrieved %d results in %f seconds' % (len(output_fns), (time.time() - t))
 
