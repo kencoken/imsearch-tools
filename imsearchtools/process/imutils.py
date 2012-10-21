@@ -8,7 +8,7 @@ Created on: 19 Oct 2012
 """
 
 import numpy as np
-import skimage.io
+#import skimage.io
 import scipy.misc
 import math
 
@@ -20,10 +20,12 @@ def image_exists(fn):
     return True
 
 def load_image(fn):
-    return skimage.io.imread(fn)
+    #return skimage.io.imread(fn)
+    return scipy.misc.imread(fn)
 
 def save_image(fn, im):
-    skimage.io.imsave(fn, im)
+    #skimage.io.imsave(fn, im)
+    return scipy.misc.imsave(fn, im)
 
 def create_thumbnail(im, shape=(128,128), pad_to_size=True):
     h, w = im.shape[:2]
