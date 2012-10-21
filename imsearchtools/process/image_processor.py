@@ -39,10 +39,12 @@ class ImageProcessorSettings(object):
                            max_size_bytes = 2*4*1024*1024) #2 MP
 
         self.conversion = dict(format = 'jpg',
-                               suffix = '-clean')
+                               suffix = '-clean',
+                               subdir = '')
 
         self.thumbnail = dict(format = 'jpg',
                               suffix = '-thumb',
+                              subdir = '',
                               width = 90,
                               height = 90,
                               pad_to_size = True)
@@ -64,9 +66,12 @@ class ImageProcessor(object):
         return fn
 
     def _clean_filename_from_filename(self, fn):
-        return (os.path.splitext(fn)[0] +
-                self.opts.conversion['suffix'] + '.' +
-                self.opts.conversion['format'].lower())
+        clean_fn =  (os.path.splitext(fn)[0] +
+                     self.opts.conversion['suffix'] + '.' +
+                     self.opts.conversion['format'].lower())
+        if self.opts.conversion['subdir']:
+            clean_fn = os.path.join(self.opts.conversion['subdir'], clean_fn)
+        return clean_fn
 
     def _thumb_filename_from_filename(self, fn):
         fmt = '{}{}-{}x{}.{}'
@@ -74,7 +79,10 @@ class ImageProcessor(object):
         suffix = self.opts.thumbnail['suffix']
         width, height = self.opts.thumbnail['width'], self.opts.thumbnail['height']
         extension = self.opts.thumbnail['format'].lower()
-        return fmt.format(name, suffix, width, height, extension)
+        thumb_fn = fmt.format(name, suffix, width, height, extension)
+        if self.opts.thumbnail['subdir']:
+            thumb_fn = os.path.join(self.opts.thumbnail['subdir'], thumb_fn)
+        return thumb_fn
 
     # Process image and standardize it
     def process_image(self, fn):
