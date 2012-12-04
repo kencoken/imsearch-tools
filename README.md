@@ -16,6 +16,7 @@ Installation Instructions
      - `pil` (Python Imaging Library)
      - `numpy`
      - `scipy`
+     - `pyzmq` (ZeroMQ)
  + Add `imsearchtools` directory to your `PYTHON_PATH`
  + Update `authentication.py` in the `/imsearchtools/engines/api_credentials` directory
    with appropriate API keys for each method (see section below for how to obtain keys –
