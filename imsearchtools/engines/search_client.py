@@ -2,6 +2,9 @@
 
 import gevent
 
+class QueryException(Exception):
+    pass
+
 ## Search Classes
 #  --------------------------------------------
 
@@ -95,5 +98,8 @@ class SearchClient(object):
                                                                aux_params=aux_params,
                                                                headers=headers,
                                                                num_results=num_results))
+
+        if not results:
+            raise QueryException("No image URLs could be retrieved")
         
         return results

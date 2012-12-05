@@ -97,6 +97,6 @@ class GoogleWebSearch(restkit.Resource, SearchClient):
                                       num_results,
                                       aux_params=aux_params,
                                       headers=headers)
-
+        
         return results
     

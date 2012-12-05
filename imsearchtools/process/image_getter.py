@@ -110,6 +110,10 @@ class ImageGetter(ImageProcessor):
             
         """
 
+        # check input parameters
+        if not urls:
+            raise ValueError('At least one url must be specified for processing')
+
         # prepare workers for callback if using callback function
         # returned process will end once all callbacks have been completed
         if completion_func:
