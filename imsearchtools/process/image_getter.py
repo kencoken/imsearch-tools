@@ -8,7 +8,7 @@ Created on: 19 Oct 2012
 """
 
 import gevent
-import restkit
+import requests
 import os
 import urlparse
 
@@ -45,8 +45,20 @@ class ImageGetter(ImageProcessor):
             output_fn = os.path.join(output_dir, self._filename_from_urldata(urldata))
             self._download_image(urldata['url'], output_fn)
             clean_fn, thumb_fn = self.process_image(output_fn)
-        except restkit.errors.RequestError, e:
+        except requests.RequestException, e:
             log.info('Request exception for %s (%s)', urldata['url'], str(e))
+            error_occurred = True
+        except requests.ConnectionError, e:
+            log.info('Connection error for %s (%s)', urldata['url'], str(e))
+            error_occurred = True
+        except requests.HTTPError, e:
+            log.info('HTTP error for %s (%s)', urldata['url'], str(e))
+            error_occurred = True
+        except requests.URLRequired, e:
+            log.info('URL required error for %s (%s)', urldata['url'], str(e))
+            error_occurred = True
+        except requests.TooManyRedirects, e:
+            log.info('Too many redirects error for %s (%s)', urldata['url'], str(e))
             error_occurred = True
         except IOError, e:
             log.info('IO Error for: %s (%s)', urldata['url'], str(e))
@@ -79,12 +91,11 @@ class ImageGetter(ImageProcessor):
             return
 
         log.info('Downloading URL: %s', url)
-        resp = restkit.request(url, headers=self.headers)
+        resp = requests.get(url, headers=self.headers)
+        resp.raise_for_status()
         
-        with resp.body_stream() as body:
-            with open(output_fn, "wb") as f:
-                for block in body:
-                    f.write(block)
+        with open(output_fn, 'w') as f:
+            f.write(resp.content)
         
     def process_urls(self, urls, output_dir, completion_func=None,
                      completion_worker_count=-1):
