@@ -33,9 +33,10 @@ class ImageGetter(ImageProcessor):
     Cleaned-up versions of the image, along with thumbnails, will be output.
     """
 
-    def __init__(self, timeout=5.0, opts=ImageProcessorSettings()):
+    def __init__(self, timeout=5.0, image_timeout=1.0, opts=ImageProcessorSettings()):
         self.opts = opts
         self.timeout = timeout
+        self.image_timeout = image_timeout
         self.headers = {'User-Agent': 'Mozilla/5.0'}
         self.subprocs = []
 
@@ -91,7 +92,7 @@ class ImageGetter(ImageProcessor):
             return
 
         log.info('Downloading URL: %s', url)
-        resp = requests.get(url, headers=self.headers)
+        resp = requests.get(url, headers=self.headers, timeout=self.image_timeout)
         resp.raise_for_status()
         
         with open(output_fn, 'w') as f:
