@@ -158,8 +158,8 @@ Revision History
 ----------------
 
  + *Jan 2013*
-     - Fixed issue with timeout by migrating from Restkit to Requests library
-     - Added missing GEvent monkey-patching to provide speed boost
+     - Fixed issue with timeout by migrating from `restkit` to `requests` library
+     - Added missing `gevent` monkey-patching to provide speed boost
  + *Oct 2012*
      - Added support for Bing, the new Google API and Flickr, updated to new interface
      - Added `gevent` async support
