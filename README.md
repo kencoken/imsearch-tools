@@ -6,13 +6,13 @@ Authors:
  + Ken Chatfield, University of Oxford – <ken@robots.ox.ac.uk>
  + Kevin McGuinness, Dublin City University – <kevin.mcguinness@eeng.dcu.ie>
 
-Copyright 2010-2012, all rights reserved.
+Copyright 2010-2013, all rights reserved.
 
 Installation Instructions
 -------------------------
  + Install the following Python dependencies:
      - `gevent`
-     - `restkit`
+     - `requests`
      - `pil` (Python Imaging Library)
      - `numpy`
      - `scipy`
@@ -157,6 +157,9 @@ determined by the `completion_worker_count` parameter. If it is not specified, b
 Revision History
 ----------------
 
+ + *Jan 2013*
+     - Fixed issue with timeout by migrating from Restkit to Requests library
+     - Added missing GEvent monkey-patching to provide speed boost
  + *Oct 2012*
      - Added support for Bing, the new Google API and Flickr, updated to new interface
      - Added `gevent` async support

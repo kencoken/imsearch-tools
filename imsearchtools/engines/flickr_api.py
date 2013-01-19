@@ -1,12 +1,7 @@
 #!/usr/bin/env python
 
-import restkit
+import requests
 from hashlib import md5
-
-try:
-    import simplejson as json
-except ImportError:
-    import json # Python 2.6+ only
 
 from search_client import *
 from api_credentials import *
@@ -20,13 +15,16 @@ FLICKR_API_METHOD = 'flickr.photos.search'
 ## Search Class
 #  --------------------------------------------
 
-class FlickrAPISearch(restkit.Resource, SearchClient):
+class FlickrAPISearch(requests.Session, SearchClient):
     """Wrapper class for Flickr API. For more details see:
     http://www.flickr.com/services/api/
     """
     
     def __init__(self, async_query=True, timeout=5.0, **kwargs):
-        super(FlickrAPISearch, self).__init__(FLICKR_API_ENTRY, **kwargs)
+        super(FlickrAPISearch, self).__init__()
+
+        self.headers.update(kwargs)
+        self.timeout = timeout
 
         self._results_per_req = 100
         self._supported_sizes_map = {'small': 't',
@@ -35,7 +33,6 @@ class FlickrAPISearch(restkit.Resource, SearchClient):
         self._supported_styles_map = {'photo': 'photo'}
         
         self.async_query = async_query
-        self.timeout = timeout
 
     def _fetch_results_from_offset(self, query, result_offset,
                                    aux_params={}, headers={},
@@ -52,19 +49,21 @@ class FlickrAPISearch(restkit.Resource, SearchClient):
                                  self._results_per_req)
             page_num = result_offset / self._results_per_req
             # add query position to auxilary parameters
+            aux_params['text'] = query
             aux_params['per_page'] = self._results_per_req
             aux_params['page'] = page_num
-            
-            resp = self.get(params_dict=aux_params,
-                            headers=headers,
-                            text=query)
+
+            resp = self.get(FLICKR_API_ENTRY,
+                            params=aux_params,
+                            headers=headers)
+            resp.raise_for_status()
 
             # extract list of results from response
-            result_dict = json.loads(resp.body_string())
+            result_dict = resp.json()
 
             return result_dict['photos']['photo']
 
-        except restkit.errors.RequestError:
+        except requests.exceptions.RequestException:
             return []
 
     def __flickr_results_to_results(self, results, size=None):

@@ -5,9 +5,6 @@ import time
 import sys
 import os
 
-from gevent import monkey
-monkey.patch_all(thread=False, select=False, httplib=True)
-
 
 def test_callback(out_dict):
     import json

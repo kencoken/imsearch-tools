@@ -1,12 +1,7 @@
 #!/usr/bin/env python
 
-import restkit
+import requests
 from hashlib import md5
-
-try:
-    import simplejson as json
-except ImportError:
-    import json # Python 2.6+ only
 
 from search_client import *
 from api_credentials import *
@@ -20,7 +15,7 @@ GOOGLE_OLD_API_FUNC = 'images'
 ## Search Class
 #  --------------------------------------------
 
-class GoogleOldAPISearch(restkit.Resource, SearchClient):
+class GoogleOldAPISearch(requests.Session, SearchClient):
     """Wrapper class for Google Image Search API. For more details see:
     https://developers.google.com/image-search/
     
@@ -28,7 +23,10 @@ class GoogleOldAPISearch(restkit.Resource, SearchClient):
     """
     
     def __init__(self, async_query=True, timeout=5.0, **kwargs):
-        super(GoogleOldAPISearch, self).__init__(GOOGLE_OLD_API_ENTRY, **kwargs)
+        super(GoogleOldAPISearch, self).__init__()
+
+        self.headers.update(kwargs)
+        self.timeout = timeout
 
         self._results_per_req = 8
         self._supported_sizes_map = {'small': 'small',
@@ -40,7 +38,6 @@ class GoogleOldAPISearch(restkit.Resource, SearchClient):
                                       'lineart': 'lineart',
                                       'face': 'face'}
         self.async_query = async_query
-        self.timeout = timeout
 
     def _fetch_results_from_offset(self, query, result_offset,
                                    aux_params={}, headers={},
@@ -51,19 +48,19 @@ class GoogleOldAPISearch(restkit.Resource, SearchClient):
             req_result_count = min(self._results_per_req, num_results-result_offset)
 
             # add query position to auxilary parameters
+            aux_params['q'] = query
             aux_params['start'] = result_offset
             aux_params['rsz'] = req_result_count
-            
-            resp = self.get(GOOGLE_OLD_API_FUNC, params_dict=aux_params,
-                            headers=headers,
-                            q=query)
+
+            resp = self.get(GOOGLE_OLD_API_ENTRY + GOOGLE_OLD_API_FUNC,
+                            params=aux_params, headers=headers)
 
             # extract list of results from response
-            result_dict = json.loads(resp.body_string())
+            result_dict = resp.json()
 
             return result_dict['responseData']['results']
 
-        except restkit.errors.RequestError:
+        except requests.exceptions.RequestException:
             return []
 
     def __google_results_to_results(self, results):

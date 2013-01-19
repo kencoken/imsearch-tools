@@ -1,13 +1,8 @@
 #!/usr/bin/env python
 
-import restkit
+import requests
 import re
 from hashlib import md5
-
-try:
-    import simplejson as json
-except ImportError:
-    import json # Python 2.6+ only
 
 from search_client import *
 from api_credentials import *
@@ -21,7 +16,7 @@ GOOGLE_WEB_FUNC = 'images'
 ## Search Class
 #  --------------------------------------------
 
-class GoogleWebSearch(restkit.Resource, SearchClient):
+class GoogleWebSearch(requests.Session, SearchClient):
     """Wrapper class for Google Image Search using web interface.
 
     This class does not use any API, but instead extracts results directly from the
@@ -31,7 +26,10 @@ class GoogleWebSearch(restkit.Resource, SearchClient):
     """
     
     def __init__(self, async_query=True, timeout=5.0, **kwargs):
-        super(GoogleWebSearch, self).__init__(GOOGLE_WEB_ENTRY, **kwargs)
+        super(GoogleWebSearch, self).__init__()
+
+        self.headers.update(kwargs)
+        self.timeout = timeout
 
         self._results_per_req = 20
         self._supported_sizes_map = {'small': 's',
@@ -43,7 +41,6 @@ class GoogleWebSearch(restkit.Resource, SearchClient):
                                       'lineart': 'lineart',
                                       'face': 'face'}
         self.async_query = async_query
-        self.timeout = timeout
 
     def _fetch_results_from_offset(self, query, result_offset,
                                    aux_params={}, headers={},
@@ -55,13 +52,13 @@ class GoogleWebSearch(restkit.Resource, SearchClient):
             
         try:
             # add query position to auxilary parameters
+            aux_params['q'] = query
             aux_params['start'] = result_offset
 
-            resp = self.get('images', params_dict=aux_params,
-                            headers=headers,
-                            q=query)
+            resp = self.get(GOOGLE_WEB_ENTRY + GOOGLE_WEB_FUNC,
+                            params=aux_params, headers=headers)
 
-            resp_str = resp.body_string()
+            resp_str = resp.text
             image_urls = image_url_pattern.findall(resp_str)
             image_ids = image_id_pattern.findall(resp_str)
 
@@ -69,7 +66,7 @@ class GoogleWebSearch(restkit.Resource, SearchClient):
                           'image_id': md5(item[1]).hexdigest()} for item in zip(image_urls, image_ids)]
 
             return resp_dict
-        except restkit.errors.RequestError:
+        except requests.exceptions.RequestException:
             return []
         
     def query(self, query, size='medium', style='photo', num_results=100):

@@ -15,12 +15,12 @@ if not os.path.isdir(outdir):
     os.makedirs(outdir)
 
 test_bing_api = True
-test_google_old_api = False
-test_google_api = False
-test_google_web = False
-test_flickr_api = False
+test_google_old_api = True
+test_google_api = True
+test_google_web = True
+test_flickr_api = True
 
-display_results = False
+display_results = True
 
 all_results = []
 all_generator_names = []

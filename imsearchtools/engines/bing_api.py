@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-import restkit
+import requests
 from hashlib import md5
 
 try:
@@ -17,17 +17,22 @@ from api_credentials import *
 BING_API_ENTRY = 'https://api.datamarket.azure.com/Data.ashx/Bing/Search/v1/'
 BING_API_FUNC = 'Image'
 
+DEBUG_MESSAGES = False
+
 ## Search Class
 #  --------------------------------------------
 
-class BingAPISearch(restkit.Resource, SearchClient):
+class BingAPISearch(requests.Session, SearchClient):
     """Wrapper class for Bing Image Search API. For more details see:
     http://www.bing.com/developers/
     """
 
     def __init__(self, async_query=True, timeout=5.0, **kwargs):
-        auth = restkit.BasicAuth('', BING_API_KEY)
-        super(BingAPISearch, self).__init__(BING_API_ENTRY, filters=[auth], **kwargs)
+        super(BingAPISearch, self).__init__()
+        
+        self.auth = ('', BING_API_KEY)
+        self.headers.update(kwargs)
+        self.timeout = timeout
 
         self._results_per_req = 50
         self._supported_sizes_map = {'small': 'Small',
@@ -36,7 +41,6 @@ class BingAPISearch(restkit.Resource, SearchClient):
         self._supported_styles_map = {'photo': 'Photo',
                                       'graphics': 'Graphics'}
         self.async_query = async_query
-        self.timeout = timeout
 
     def _fetch_results_from_offset(self, query, result_offset,
                                    aux_params={}, headers={},
@@ -47,27 +51,32 @@ class BingAPISearch(restkit.Resource, SearchClient):
         try:
             quoted_query = "'%s'" % query
 
-            print quoted_query
-            print BING_API_FUNC
+            if DEBUG_MESSAGES:
+                print quoted_query
+                print BING_API_FUNC
 
             req_result_count = min(self._results_per_req, num_results-result_offset)
 
             # add query position to auxilary parameters
+            aux_params['Query'] = quoted_query
             aux_params['$skip'] = result_offset
             aux_params['$top'] = req_result_count
-            print aux_params
+            if DEBUG_MESSAGES:
+                print aux_params
 
-            resp = self.get(BING_API_FUNC, params_dict=aux_params,
-                            headers=headers,
-                            Query=quoted_query)
+            resp = self.get(BING_API_ENTRY + BING_API_FUNC, params=aux_params,
+                            headers=headers)
+            resp.raise_for_status()
 
             # extract list of results from response
-            result_dict = json.loads(resp.body_string())
-            print json.dumps(result_dict)
+            result_dict = resp.json()
+            if DEBUG_MESSAGES:
+                print json.dumps(result_dict)
 
             return result_dict['d']['results']
-        except restkit.errors.RequestError, e:
-            print str(e)
+        except requests.exceptions.RequestException, e:
+            if DEBUG_MESSAGES:
+                print str(e)
             return []
 
     def __bing_results_to_results(self, results):
