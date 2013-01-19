@@ -5,11 +5,14 @@ import time
 import sys
 import os
 
+from gevent import monkey
+monkey.patch_all(thread=False, select=False, httplib=True)
+
 
 def test_callback(out_dict):
     import json
     print json.dumps(out_dict)
-    time.sleep(0.2)
+    #time.sleep(0.2)
 
 if len(sys.argv) < 2:
     test_query_str = 'car'
