@@ -152,7 +152,15 @@ same form as a single entry in the list returned from `process_urls()`.
 The callbacks will be executed using a pool of worker processes, the size of which is
 determined by the `completion_worker_count` parameter. If it is not specified, by default
 *N* workers will be launched where *N* is the number of CPUs on the local system.
-    
+
+HTTP Service
+------------
+
+A simple HTTP interface to the library is provided by `imsearch_http_service.py` and
+can be launched by calling:
+
+    python imsearch_http_service.py
+
     
 Revision History
 ----------------
@@ -160,6 +168,7 @@ Revision History
  + *Jan 2013*
      - Fixed issue with timeout by migrating from `restkit` to `requests` library
      - Added missing `gevent` monkey-patching to provide speed boost
+     - Added HTTP service (including callback modules)
  + *Oct 2012*
      - Added support for Bing, the new Google API and Flickr, updated to new interface
      - Added `gevent` async support
