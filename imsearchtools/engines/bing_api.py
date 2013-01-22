@@ -29,6 +29,9 @@ class BingAPISearch(requests.Session, SearchClient):
 
     def __init__(self, async_query=True, timeout=5.0, **kwargs):
         super(BingAPISearch, self).__init__()
+
+        if not BING_API_KEY:
+            raise NoAPICredentials('API Credentials must be specified in imsearch/engines/api_credentials.py')
         
         self.auth = ('', BING_API_KEY)
         self.headers.update(kwargs)

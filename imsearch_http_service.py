@@ -11,6 +11,7 @@ from imsearchtools import process as image_process
 from imsearchtools import postproc_modules
 
 SERVER_PORT = 8150
+SUPPORTED_ENGINES = ['bing_api', 'google_old_api', 'google_api', 'google_web', 'flickr_api']
 
 app = Flask(__name__)
 app.debug = True
@@ -72,7 +73,7 @@ def index():
 def query():
     # parse GET args
     query = request.args['q']
-    engine = request.args.get('engine', 'bing_api')
+    engine = request.args.get('engine', 'google_web')
 
     query_params = dict()
     for param_nm in ['size', 'style', 'num_results']:
@@ -100,11 +101,15 @@ def download():
 def get_postproc_module_list():
     return json.dumps(postproc_modules.get_module_list())
 
+@app.route('/get_engine_list')
+def get_engine_list():
+    return json.dumps(SUPPORTED_ENGINES)
+
 @app.route('/exec_pipeline', methods=['POST'])
 def exec_pipeline():
     # parse POST form args
     query = request.form['q']
-    engine = request.form.get('engine', 'bing_api')
+    engine = request.form.get('engine', 'google_web')
     postproc_module = request.form.get('postproc_module', None) # default to no postproc module
     postproc_extra_prms = request.form.get('postproc_extra_prms', None)
     if postproc_extra_prms:

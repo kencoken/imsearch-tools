@@ -19,11 +19,11 @@ Installation Instructions
      - `pyzmq` (ZeroMQ)
      - `flask` (*only if using HTTP server interface*)
  + Add `imsearchtools` directory to your `PYTHON_PATH`
- + Update `authentication.py` in the `/imsearchtools/engines/api_credentials` directory
-   with appropriate API keys for each method (see section below for how to obtain keys –
-   note some default keys are provided, but it would be greatly appreciated if you could
-   generate your own if using any of the API functions, as they are linked to my personal
-   accounts *-Ken*)
+ + Update `api_credentials.py` in the `/imsearchtools/engines` directory with appropriate
+   API keys for each method you plan to use. Some example keys are provided (commented out)
+   which can be used for quick validation, but these are my personal keys so it would be
+   *greatly appreciated* if you could secure your own using the methods described in the
+   section below if you will be using the API-based engines extensively
    
 Usage Instructions
 ------------------

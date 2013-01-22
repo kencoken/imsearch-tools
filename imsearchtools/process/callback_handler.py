@@ -9,16 +9,19 @@ Created on: 20 Oct 2012
 
 import logging
 import zmq
+import random
 
 from multiprocessing import Process
 from multiprocessing import cpu_count
 
 log = logging.getLogger(__name__)
 
-ZMQ_TASK_LAUNCH_CH = 'ipc:///tmp/zmq_imsearchtools_task_ch'#'tcp://127.0.0.1:5557'
-ZMQ_TASK_COUNT_DEC_CH = 'ipc:///tmp/zmq_imsearchtools_tcdec_ch'#'tcp://127.0.0.1:5558'
-ZMQ_TASK_RESULT_CH = 'ipc:///tmp/zmq_imsearchtools_result_ch'#'tcp://127.0.0.1:5559'
-ZMQ_WORKER_CONTROL_CH = 'ipc:///tmp/zmq_imsearchtools_control_ch'#'tcp://127.0.0.1:5560'
+random.seed()
+pipe_name_hash = str(int(round(random.random()*1000000.0)))
+ZMQ_TASK_LAUNCH_CH = 'ipc:///tmp/zmq_imsearchtools_task_ch_' + pipe_name_hash
+ZMQ_TASK_COUNT_DEC_CH = 'ipc:///tmp/zmq_imsearchtools_tcdec_ch_' + pipe_name_hash
+ZMQ_TASK_RESULT_CH = 'ipc:///tmp/zmq_imsearchtools_result_ch_' + pipe_name_hash
+ZMQ_WORKER_CONTROL_CH = 'ipc:///tmp/zmq_imsearchtools_control_ch_' + pipe_name_hash
 
 ZMQ_RESULT_SKIPPING = 'SKIPPING'
 ZMQ_RESULT_DONE = 'DONE'

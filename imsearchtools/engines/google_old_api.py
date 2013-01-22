@@ -25,6 +25,9 @@ class GoogleOldAPISearch(requests.Session, SearchClient):
     def __init__(self, async_query=True, timeout=5.0, **kwargs):
         super(GoogleOldAPISearch, self).__init__()
 
+        if not GOOGLE_OLD_API_KEY:
+            raise NoAPICredentials('API Credentials must be specified in imsearch/engines/api_credentials.py')
+
         self.headers.update(kwargs)
         self.timeout = timeout
 

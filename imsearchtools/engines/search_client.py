@@ -5,6 +5,9 @@ import gevent
 class QueryException(Exception):
     pass
 
+class NoAPICredentials(Exception):
+    pass
+
 ## Search Classes
 #  --------------------------------------------
 
