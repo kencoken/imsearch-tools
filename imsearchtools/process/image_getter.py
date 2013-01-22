@@ -40,7 +40,8 @@ class ImageGetter(ImageProcessor):
         self.headers = {'User-Agent': 'Mozilla/5.0'}
         self.subprocs = []
 
-    def process_url(self, urldata, output_dir, call_completion_func=False):
+    def process_url(self, urldata, output_dir, call_completion_func=False,
+                    completion_extra_prms=None):
         error_occurred = False
         try:
             output_fn = os.path.join(output_dir, self._filename_from_urldata(urldata))
@@ -76,7 +77,10 @@ class ImageGetter(ImageProcessor):
 
             if call_completion_func:
                 # use callback handler to run completion func configured in process_urls
-                self._callback_handler.run_callback(out_dict)
+                if completion_extra_prms:
+                    self._callback_handler.run_callback(out_dict, completion_extra_prms)
+                else:
+                    self._callback_handler.run_callback(out_dict)
 
             return out_dict
         else:
@@ -99,7 +103,7 @@ class ImageGetter(ImageProcessor):
             f.write(resp.content)
         
     def process_urls(self, urls, output_dir, completion_func=None,
-                     completion_worker_count=-1):
+                     completion_worker_count=-1, completion_extra_prms=None):
         """Process returned list of URL dicts returned from search client class
 
         Args:
@@ -136,7 +140,8 @@ class ImageGetter(ImageProcessor):
         # launch main URL processor jobs
         jobs = [gevent.spawn(self.process_url,
                              urldata, output_dir,
-                             call_completion_func=(completion_func is not None))
+                             call_completion_func=(completion_func is not None),
+                             completion_extra_prms=completion_extra_prms)
                 for urldata in urls]
 
         # wait for all URL processor jobs to complete

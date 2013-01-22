@@ -32,9 +32,14 @@ def imsearch_query(query, engine, query_params):
 
     return searcher.query(query, **query_params)
 
-def imsearch_download_to_static(query_res_list, postproc_module=None):
+def imsearch_download_to_static(query_res_list, postproc_module=None,
+                                postproc_extra_prms=None,
+                                custom_local_path=None):
     imgetter = image_process.ImageGetter()
-    outdir = os.path.join(os.getcwd(), 'static')
+    if not custom_local_path:
+        outdir = os.path.join(os.getcwd(), 'static')
+    else:
+        outdir = custom_local_path
     if not os.path.isdir(outdir):
         os.makedirs(outdir)
 
@@ -42,7 +47,11 @@ def imsearch_download_to_static(query_res_list, postproc_module=None):
     # of the module
     if postproc_module:
         callback_func = postproc_modules.get_module_callback(postproc_module)
-        return imgetter.process_urls(query_res_list, outdir, callback_func)
+        if postproc_extra_prms:
+            return imgetter.process_urls(query_res_list, outdir, callback_func,
+                                         completion_extra_prms=postproc_extra_prms)
+        else:
+            return imgetter.process_urls(query_res_list, outdir, callback_func)
     else:
         return imgetter.process_urls(query_res_list, outdir)
 
@@ -97,6 +106,10 @@ def exec_pipeline():
     query = request.form['q']
     engine = request.form.get('engine', 'bing_api')
     postproc_module = request.form.get('postproc_module', None) # default to no postproc module
+    postproc_extra_prms = request.form.get('postproc_extra_prms', None)
+    if postproc_extra_prms:
+        postproc_extra_prms = json.loads(postproc_extra_prms)
+    custom_local_path = request.form.get('custom_local_path', None)
     # < default to returning list only if not using postproc module >
     return_dfiles_list = request.form.get('return_dfiles_list', (postproc_module == None))
     return_dfiles_list = (int(return_dfiles_list) == 1)
@@ -107,14 +120,18 @@ def exec_pipeline():
             query_params[param_nm] = request.form[param_nm]
     # execute query
     query_res_list = imsearch_query(query, engine, query_params)
-    #query_res_list = query_res_list[:5] # DEBUG CODE
+    query_res_list = query_res_list[:5] # DEBUG CODE
     # download images
-    dfiles_list = imsearch_download_to_static(query_res_list, postproc_module)
-    # convert pathnames to URL paths
-    url_dfiles_list = make_url_dfiles_list(dfiles_list)
+    dfiles_list = imsearch_download_to_static(query_res_list, postproc_module,
+                                              postproc_extra_prms,
+                                              custom_local_path)
+    # convert pathnames to URL paths (if not running locally and specifying
+    # a custom path)
+    if not custom_local_path:
+        dfiles_list = make_url_dfiles_list(dfiles_list)
 
     if return_dfiles_list:
-        return Response(json.dumps(url_dfiles_list), mimetype='application/json')
+        return Response(json.dumps(dfiles_list), mimetype='application/json')
     else:
         return 'DONE'
 
