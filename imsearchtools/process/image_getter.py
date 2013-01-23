@@ -8,6 +8,7 @@ Created on: 19 Oct 2012
 """
 
 import gevent
+from gevent.timeout import Timeout
 import requests
 import os
 import urlparse
@@ -149,7 +150,23 @@ class ImageGetter(ImageProcessor):
 
         # if using callbacks, wait for all callbacks to complete before continuing
         if completion_func:
-            self._callback_handler.join()
+            # detect if timeout occurred by iterating through jobs and using 'get', which
+            # will re-raise the Timeout exception for any jobs
+            timeout_occurred = False
+            try:
+                for job in jobs:
+                    job.get(block=False)
+            except Timeout:
+                timeout_occurred = True
+                log.info('Timeout occurred when processing jobs')
+
+            # only wait for callback handler if timeout didn't occur
+            # (as timeout will cause uncompleted gevent jobs to be forcibly ended
+            #  thus never returning to allow job manager to in turn return)
+            if not timeout_occurred:
+                self._callback_handler.join()
+            else:
+                self._callback_handler.terminate()
 
         # construct return list of filenames
         results = []

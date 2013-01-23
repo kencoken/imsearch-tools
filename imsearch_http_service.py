@@ -152,7 +152,7 @@ def exec_pipeline():
             query_params[param_nm] = request.form[param_nm]
     # execute query
     query_res_list = imsearch_query(query, engine, query_params, query_timeout)
-    query_res_list = query_res_list[:5] # DEBUG CODE
+    #query_res_list = query_res_list[:5] # DEBUG CODE
     # prepare download params
     imgetter_params = dict()
     for param_nm in ['improc_timeout', 'per_image_timeout']:

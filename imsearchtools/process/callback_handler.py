@@ -84,10 +84,21 @@ class CallbackHandler(object):
 
     def join(self):
         # wait first for the result manager to terminate
+        log.debug('Waiting for result manager to return...')
         self.result_manager.join()
+        log.debug('Result manager returned!')
         # this should cause the workers to also terminate,
         #  but wait for them to explicitly say they're done too
+        log.debug('Waiting for workers to return...')
         self.workers.join()
+        log.debug('Workers returned!')
+
+    def terminate(self):
+        log.debug('Forcefully terminating result manager')
+        self.result_manager.terminate()
+        log.debug('Forcefully terminating workers')
+        self.workers.terminate()
+        log.debug('Done terminating!')
 
 class CallbackTaskRunner(object):
     """Class used internally by CallbackHandler to launch tasks"""
@@ -124,6 +135,10 @@ class CallbackTaskWorkers(object):
     def join(self):
         for worker in self.workers:
             worker.join()
+
+    def terminate(self):
+        for worker in self.workers:
+            worker.terminate()
 
     def _callback_worker(self, wrk_num, worker_func):
         log.debug('Initializing worker number %d', wrk_num)
