@@ -36,7 +36,8 @@ class ImageProcessorSettings(object):
                            min_height = 1,
                            max_width = 10000,
                            max_height = 10000,
-                           max_size_bytes = 2*4*1024*1024) #2 MP
+                           max_size_bytes = 2*4*1024*1024, #2 MP
+                           remove_flickr_placeholders = False)
 
         self.conversion = dict(format = 'jpg',
                                suffix = '-clean',
@@ -104,6 +105,8 @@ class ImageProcessor(object):
         # write converted version
         clean_fn = self._clean_filename_from_filename(fn)
         if not imutils.image_exists(clean_fn):
+            if self.opts.filter['remove_flickr_placeholders']:
+                self._filter_flickr_placeholder(fn)
             convimg = imutils.downsize_by_max_dims(im.image,
                                                    (self.opts.conversion['max_height'],
                                                     self.opts.conversion['max_width']))
@@ -141,3 +144,9 @@ class ImageProcessor(object):
             raise FilterException, 'h > max_height'
         if nbytes > self.opts.filter['max_size_bytes']:
             raise FilterException, 'nbytes > max_size_bytes'
+
+    def _filter_flickr_placeholder(self, fn):
+        import hashlib
+        with open(fn) as fid:
+            if hashlib.sha256(fid.read()).hexdigest() == '0f28f49410a89e24c95acfd345210cc6f2294814584ad7c60f698fee74e46aad':
+                raise FilterException, 'Flickr placeholder image filtered'
