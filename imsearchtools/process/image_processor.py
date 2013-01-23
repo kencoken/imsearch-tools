@@ -40,6 +40,8 @@ class ImageProcessorSettings(object):
 
         self.conversion = dict(format = 'jpg',
                                suffix = '-clean',
+                               max_width = 10000,
+                               max_height = 10000,
                                subdir = '')
 
         self.thumbnail = dict(format = 'jpg',
@@ -102,7 +104,10 @@ class ImageProcessor(object):
         # write converted version
         clean_fn = self._clean_filename_from_filename(fn)
         if not imutils.image_exists(clean_fn):
-            imutils.save_image(clean_fn, im.image)
+            convimg = imutils.downsize_by_max_dims(im.image,
+                                                   (self.opts.conversion['max_width'],
+                                                    self.opts.conversion['max_height']))
+            imutils.save_image(clean_fn, convimg)
         else:
             log.info('Converted image available: %s', clean_fn)
 

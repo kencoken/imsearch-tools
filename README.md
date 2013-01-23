@@ -23,7 +23,7 @@ Installation Instructions
    API keys for each method you plan to use. Some example keys are provided (commented out)
    which can be used for quick validation, but these are my personal keys so it would be
    *greatly appreciated* if you could secure your own using the methods described in the
-   section below if you will be using the API-based engines extensively
+   section below if you will be using the API-based engines extensively.
    
 Usage Instructions
 ------------------
@@ -118,10 +118,12 @@ instance of the `process.ImageProcessorSettings` class to `process.ImageGetter()
 initialization e.g.:
 
     >> opts = imsearchtools.process.ImageProcessorSettings()
-    >> opts.filter['max_height'] = 600   # set maximum image size to 800x600
-    >> opts.filter['max_width'] = 800    #    (discarding larger images)
-    >> opts.conversion['format'] = 'png' # change output format
-    >> opts.thumbnail['height'] = 50     # change width and height of thumbnails to 50x50
+    >> opts.filter['max_height'] = 600     # set maximum image size to 800x600
+    >> opts.filter['max_width'] = 800      #    (discarding larger images)
+    >> opts.conversion['format'] = 'png'   # change output format to png
+    >> opts.conversion['max_height'] = 400 # set maximum image size to 600x400
+    >> opts.conversion['max_width'] = 600  #    (downsizing larger images)
+    >> opts.thumbnail['height'] = 50       # change width and height of thumbnails to 50x50
     >> opts.thumbnail['width'] = 50
     >> opts.thumbnail['pad_to_size'] = False # don't add padding to thumbnails
     >> getter = imsearchtools.process.ImageGetter(opts)
