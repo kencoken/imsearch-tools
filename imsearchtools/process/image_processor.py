@@ -105,8 +105,8 @@ class ImageProcessor(object):
         clean_fn = self._clean_filename_from_filename(fn)
         if not imutils.image_exists(clean_fn):
             convimg = imutils.downsize_by_max_dims(im.image,
-                                                   (self.opts.conversion['max_width'],
-                                                    self.opts.conversion['max_height']))
+                                                   (self.opts.conversion['max_height'],
+                                                    self.opts.conversion['max_width']))
             imutils.save_image(clean_fn, convimg)
         else:
             log.info('Converted image available: %s', clean_fn)
@@ -115,8 +115,8 @@ class ImageProcessor(object):
         thumb_fn = self._thumb_filename_from_filename(fn)
         if not imutils.image_exists(thumb_fn):
             thumbnail = imutils.create_thumbnail(im.image,
-                                                 (self.opts.thumbnail['width'],
-                                                  self.opts.thumbnail['height']))
+                                                 (self.opts.thumbnail['height'],
+                                                  self.opts.thumbnail['width']))
             imutils.save_image(thumb_fn, thumbnail)
         else:
             log.info('Thumbnail image available: %s', thumb_fn)

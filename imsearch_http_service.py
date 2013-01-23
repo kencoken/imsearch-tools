@@ -41,7 +41,7 @@ def imsearch_query(query, engine, query_params, query_timeout=-1.0):
 def imsearch_download_to_static(query_res_list, postproc_module=None,
                                 postproc_extra_prms=None,
                                 custom_local_path=None,
-                                imgetter_params=None)
+                                imgetter_params=None):
     # prepare extra parameters if required
     ig_params = dict()
     if imgetter_params:
@@ -52,13 +52,13 @@ def imsearch_download_to_static(query_res_list, postproc_module=None,
         do_width_resize = ('resize_width' in imgetter_params and imgetter_params['resize_width'] > 0)
         do_height_resize = ('resize_height' in imgetter_params and imgetter_params['resize_height'] > 0)
         if do_width_resize or do_height_resize:
-            improc_settings = ImageProcessorSettings()
+            improc_settings = image_process.ImageProcessorSettings()
             if do_width_resize:
                 improc_settings.conversion['max_width'] = imgetter_params['resize_width']
             if do_height_resize:
                 improc_settings.conversion['max_height'] = imgetter_params['resize_height']
             ig_params['opts'] = improc_settings
-        
+
     imgetter = image_process.ImageGetter(**ig_params)
         
     if not custom_local_path:

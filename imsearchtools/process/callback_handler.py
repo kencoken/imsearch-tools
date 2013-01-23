@@ -10,6 +10,7 @@ Created on: 20 Oct 2012
 import logging
 import zmq
 import random
+from time import sleep
 
 from multiprocessing import Process
 from multiprocessing import cpu_count
@@ -22,10 +23,12 @@ ZMQ_TASK_LAUNCH_CH = 'ipc:///tmp/zmq_imsearchtools_task_ch_' + pipe_name_hash
 ZMQ_TASK_COUNT_DEC_CH = 'ipc:///tmp/zmq_imsearchtools_tcdec_ch_' + pipe_name_hash
 ZMQ_TASK_RESULT_CH = 'ipc:///tmp/zmq_imsearchtools_result_ch_' + pipe_name_hash
 ZMQ_WORKER_CONTROL_CH = 'ipc:///tmp/zmq_imsearchtools_control_ch_' + pipe_name_hash
+ZMQ_WORKER_SYNC_CH = 'ipc:///tmp/zmq_imsearchtools_sync_ch_' + pipe_name_hash
 
 ZMQ_RESULT_SKIPPING = 'SKIPPING'
 ZMQ_RESULT_DONE = 'DONE'
 ZMQ_CONTROL_DONE = 'FINISHED'
+ZMQ_CONTROL_SYNC = 'INITIALIZED'
 
 class CallbackHandler(object):
     """Class for wrapping callbacks using ZMQ
@@ -46,6 +49,9 @@ class CallbackHandler(object):
     """
     def __init__(self, worker_func, task_count, worker_count=-1):
         # initialize completion task workers
+        # if number of workers is not specified, set it to the number of CPUs
+        if worker_count == -1:
+            worker_count = cpu_count()
         self.workers = CallbackTaskWorkers(worker_func, worker_count)
 
         # start result manager
@@ -55,6 +61,20 @@ class CallbackHandler(object):
 
         # initialize completion task runner
         self.runner = CallbackTaskRunner()
+
+        # wait for all workers to subscribe to control channel
+        # MUST be placed above all other commands in __init__ to work
+        log.debug('Waiting for %d workers to initialize...', worker_count)
+        context = zmq.Context()
+        syncservice = context.socket(zmq.REP)
+        syncservice.bind(ZMQ_WORKER_SYNC_CH)
+        subscribers = 0
+        while subscribers < worker_count:
+            msg = syncservice.recv()
+            syncservice.send(msg) # send synchronization reply
+            subscribers = subscribers + 1
+        log.debug('%d workers initialized', worker_count)
+        
 
     def run_callback(self, *args, **kwargs):
         self.runner.run(*args, **kwargs)
@@ -93,10 +113,7 @@ class CallbackTaskRunner(object):
 
 class CallbackTaskWorkers(object):
     """Class used internally by CallbackHandler to launch a pool of workers"""
-    def __init__(self, worker_func, worker_count=-1):
-        # if number of workers is not specified, set it to the number of CPUs
-        if worker_count == -1:
-            worker_count = cpu_count()
+    def __init__(self, worker_func, worker_count):
             
         self.workers = [None]*worker_count
         for wrk_num in range(worker_count):
@@ -126,6 +143,12 @@ class CallbackTaskWorkers(object):
         poller = zmq.Poller()
         poller.register(task_receiver, zmq.POLLIN)
         poller.register(control_receiver, zmq.POLLIN)
+
+        # tell callback handler that worker has initialized
+        syncservice = context.socket(zmq.REQ)
+        syncservice.connect(ZMQ_WORKER_SYNC_CH)
+        syncservice.send(ZMQ_CONTROL_SYNC)
+        syncservice.recv()
 
         # loop and accept messages from both task and control channels
         while True:
