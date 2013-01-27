@@ -178,6 +178,8 @@ For basic usage, the following function calls are provided:
      - Returns a list of the names of supported engines
        (e.g. `google_web`, `google_api` etc.)
 
+#### Callbacks and advanced usage
+       
 As a callback function cannot be passed directly to the HTTP service, the concept of
 *post-processing modules* has been introduced. These are a collection of pre-prepared
 python scripts containing a callback function of the required format and which exist
