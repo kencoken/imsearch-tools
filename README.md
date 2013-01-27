@@ -136,8 +136,9 @@ do this, specify the callback when calling `process_urls()`:
 
     import imsearchtools
     
-    def callback_func(out_dict):
+    def callback_func(out_dict, extra_prms=None):
         import json
+	print extra_prms['extra_data']
         print json.dumps(out_dict)
         sleep(0.1)
     
@@ -147,6 +148,7 @@ do this, specify the callback when calling `process_urls()`:
     getter = imsearchtools.process.ImageGetter()
     getter.process_urls(results, '/path/to/save/images',
                         completion_func=callback_func,
+			completion_extra_prms={'extra_data':'hello'},
                         completion_worker_count=8)
                         
 The form of the callback should be `f(out_dict)` where `out_dict` is a dictionary of the
@@ -164,6 +166,62 @@ can be launched by calling:
 
     python imsearch_http_service.py
 
+For basic usage, the following function calls are provided:
+
+ + `query` `GET` (*q='querytext', [engine='google_web', size='medium',
+                  style='photo', num_results=100]*)
+   - Returns JSON list of `image_id`+`url` pairs from the specified engine
+ + `download` `POST` (*<query_json>*)
+   - Accepts output from `query` and downloads the images, returning JSON output
+     of the same format as the `ImageGetter` class
+ + `get_engine_list` `GET`
+   - Returns a list of the names of supported engines
+     (e.g. `google_web`, `google_api` etc.)
+
+As a callback function cannot be passed directly to the HTTP service, the concept of
+*post-processing modules* has been introduced. These are a collection of pre-prepared
+python scripts containing a callback function of the required format and which exist
+within the `imsearchtools` module directory on the system where the server is running,
+and any of them can be specified to run after each image has been downloaded.
+
+For this functionality, and for more advanced usage (for example, to specify timeouts)
+the following functions can be used:
+ 
+ + `exec_pipeline` `POST`
+   - Execute both the query and download stages with advanced options including
+     support for callbacks. All of the parameters of the `query` function above
+     are supported (`q`, `engine`, `size`, `style`, `num_results`) along with the
+     following additional parameters:
+     + `postproc_module` – the name of the post-processing module to run after each
+       image has downloaded (use `get_postproc_module_list` for supported modules)
+     + `postproc_extra_prms` – A JSON dictionary of additional parameters to pass to
+       the post-processing module
+     + `custom_local_path` – by default images are stored in the `static/` subdirectory
+       of the server and URLs are returned (e.g. `http://server.com/static/result.jpg`).
+       If this parameter is specified, a different path on the local system is used instead
+       and the paths returned are local paths instead of URLs (e.g.
+       `/my/custom/folder/result.jpg`)
+     + `query_timeout` – timeout in seconds for the entire function call
+     + `improc_timeout` – timeout in seconds for downloading each image
+     + `resize_width` and `resize_height` – if specified, all downloaded images will be
+        downsampled so that they are at most of width `resize_width`/height `resize_height`
+     + `return_dfiles_list` – if specified, determines whether the paths to downloaded
+       images should be returned (in the same way as the `download` function above) or
+       only a shorter acknowledgement string should be returned instead. By default, if
+       `postproc_module` has not been specified the full dictionary of paths is returned,
+       and if it has then only the shorter acknowledgement string is returned
+ + `get_postproc_module_list` `GET`
+   - Returns a list of the names of supported post-processing modules
+
+#### Writing your own post-processing modules
+
+The code for all post-processing modules is stored in the `imsearchtools` package directory
+at the following location:
+
+    imsearchtools/postproc_modules/
+
+Any `*.py` file placed in this directory will be used as an additional module. Refer to the
+example in `example_textlog_module.py` for the required format of the module file.
     
 Revision History
 ----------------
