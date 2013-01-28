@@ -10,6 +10,9 @@ from imsearchtools import query as image_query
 from imsearchtools import process as image_process
 from imsearchtools import postproc_modules
 
+import logging
+logging.basicConfig()
+
 SERVER_PORT = 8150
 SUPPORTED_ENGINES = ['bing_api', 'google_old_api', 'google_api', 'google_web', 'flickr_api']
 
@@ -100,9 +103,11 @@ def query():
     engine = request.args.get('engine', 'google_web')
 
     query_params = dict()
-    for param_nm in ['size', 'style', 'num_results']:
+    for param_nm in ['size', 'style']:
         if param_nm in request.args:
             query_params[param_nm] = request.args[param_nm]
+    if 'num_results' in request.args:
+        query_params['num_results'] = int(request.args['num_results'])
     # execute query
     query_res_list = imsearch_query(query, engine, query_params)
     
@@ -147,11 +152,14 @@ def exec_pipeline():
     query_timeout = request.form.get('query_timeout', -1.0)
     query_timeout = float(query_timeout)
     query_params = dict()
-    for param_nm in ['size', 'style', 'num_results']:
+    for param_nm in ['size', 'style']:
         if param_nm in request.form:
             query_params[param_nm] = request.form[param_nm]
+    if 'num_results' in request.form:
+        query_params['num_results'] = int(request.form['num_results'])
     # execute query
     query_res_list = imsearch_query(query, engine, query_params, query_timeout)
+    print 'Query for %s completed: %d results retrieved' % (query, len(query_res_list))
     #query_res_list = query_res_list[:5] # DEBUG CODE
     # prepare download params
     imgetter_params = dict()
@@ -162,10 +170,14 @@ def exec_pipeline():
         if param_nm in request.form:
             imgetter_params[param_nm] = int(request.form[param_nm])
     # download images
+    print 'Downloading for %s started: %d sec improc_timeout, %d sec per_image_timeout' % (query,
+                                                                                           imgetter_params['improc_timeout'] if imgetter_params['improc_timeout'] else -1,
+                                                                                           imgetter_params['per_image_timeout'] if imgetter_params['per_image_timeout'] else -1)
     dfiles_list = imsearch_download_to_static(query_res_list, postproc_module,
                                               postproc_extra_prms,
                                               custom_local_path,
                                               imgetter_params)
+    print 'Downloading for %s completed: %d images retrieved' % (query, len(dfiles_list))
     # convert pathnames to URL paths (if not running locally and specifying
     # a custom path)
     if not custom_local_path:
