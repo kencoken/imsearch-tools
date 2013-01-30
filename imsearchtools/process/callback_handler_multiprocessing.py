@@ -3,18 +3,17 @@
 """
 Module: callback_handler
 Author: Ken Chatfield <ken@robots.ox.ac.uk>
-Created on: 29 Jan 2013
+        Kevin McGuinness <kevin.mcguinness@eeng.dcu.ie>
+Created on: 20 Oct 2012
 """
 
 import logging
-import gevent
-import time
+import multiprocessing
 
 log = logging.getLogger(__name__)
-#log.setLevel(logging.DEBUG)
 
 class CallbackHandler(object):
-    """Class for wrapping callbacks
+    """Class for wrapping callbacks using ZMQ
 
     Initializer Args:
         worker_func: the callback to run when calling `run_callback()`
@@ -34,54 +33,60 @@ class CallbackHandler(object):
         # initialize completion task worker pool
         # if number of workers is not specified, set it to the number of CPUs
         if worker_count == -1:
-            worker_count = 8
-        self.worker_pool = gevent.pool.Group()#(size=worker_count)
-        self.worker_pool_closed = False
+            worker_count = multiprocessing.cpu_count()
+        self.worker_pool = multiprocessing.Pool(processes=worker_count)
         # store requested task count and callback function
         self.task_count = task_count
         self.worker_func = worker_func
+        
+        self.launched_tasks = 0
+        self.skipped_tasks = 0
 
     def run_callback(self, *args, **kwargs):
         #log.debug('Starting task for file: %s', out_dict['clean_fn'])
-        if not self.worker_pool_closed:
-            log.debug('Starting task')
-            worker_params = dict(args=args,
-                                 kwargs=kwargs)
-            #self.worker_pool.apply_async(_callback_worker_func, [worker_params])
-            #                             callback=self._dec_task_count_completed)
-            self.worker_pool.spawn(self._callback_func, worker_params)
-        
+        log.debug('Starting task')
+        self.launched_tasks = self.launched_tasks + 1
+        print 'Starting task ' + str(self.launched_tasks)
+        worker_params = dict(args=args,
+                             kwargs=kwargs)
+        self.worker_pool.apply_async(_callback_worker_func, [worker_params],
+                                     callback=self._dec_task_count_completed)
 
     def skip(self):
         log.debug('Skipping task')
+        self.skipped_tasks = self.skipped_tasks + 1
+        print 'Skipping task ' + str(self.skipped_tasks)
         self._dec_task_count_skipped()
 
     def join(self):
         # waiting for all tasks to complete
         log.debug('Waiting all tasks to be completed...')
+        print "Waiting for all tasks to be completed..."
         while self.task_count > 0:
-            time.sleep(0.05)
-        self.worker_pool_closed = True
+            pass
+        self.worker_pool.close()
         self.worker_pool.join()
         log.debug('All tasks completed!')
+        print "All tasks completed!"
 
     def terminate(self):
         log.debug('Terminating workers early...')
-        self.worker_pool_closed = True
-        self.worker_pool.kill()
+        print "terminating workers early..."
+        self.worker_pool.terminate()
         self.worker_pool.join()
         log.debug('Done terminating!')
+        print 'Done terminating!'
 
-    def _callback_func(self, worker_params):
-        self.worker_func(*worker_params['args'], **worker_params['kwargs'])
-        self._dec_task_count_completed()
-        
-    def _dec_task_count_completed(self):
+    def _dec_task_count_completed(self, retval):
         self.task_count = self.task_count - 1
         log.debug('Completed post-computation, remaining tasks: %d', self.task_count)
 
     def _dec_task_count_skipped(self):
         self.task_count = self.task_count - 1
         log.debug('Skipped post-computation, remaining tasks: %d', self.task_count)
+
+def _callback_worker_func(self, worker_params):
+    worker_func(*worker_params['args'], **worker_params['kwargs'])
+    print 'Done with callback!'
 
     

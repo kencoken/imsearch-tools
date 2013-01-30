@@ -92,6 +92,19 @@ def make_url_dfiles_list(dfiles_list):
         dfile_ifo['clean_fn'] = 'http://' + request.host + dfile_ifo['clean_fn'].replace(cwd, '')
     return dfiles_list
 
+def test_func():
+    import time
+    time.sleep(5.0)
+
+@app.route('/callback_test')
+def callback_test():
+    cbhandler = image_process.CallbackHandler(test_func, 100, 50)
+    for i in range(0,100):
+        cbhandler.run_callback()
+    print 'Done launching callbacks!'
+    cbhandler.join()
+    return 'Done!'
+
 @app.route('/')
 def index():
     return "imsearch HTTP service is running"

@@ -146,7 +146,7 @@ class ImageGetter(ImageProcessor):
                 for urldata in urls]
 
         # wait for all URL processor jobs to complete
-        gevent.joinall(jobs, timeout=self.timeout)
+        gevent.joinall(jobs, timeout=1000000000000000000)#self.timeout)
 
         # if using callbacks, wait for all callbacks to complete before continuing
         if completion_func:

@@ -2,7 +2,7 @@
 
 from socket import *
 from flask import json
-import zmq
+from gevent_zeromq import zmq
 
 TCP_TERMINATOR = "$$$"
 SUCCESS_FIELD = "success"
@@ -15,6 +15,7 @@ def callback_func(out_dict, extra_prms=None):
         sock.connect((extra_prms['backend_host'], extra_prms['backend_port']))
     except error, msg:
         print 'Connect failed', msg
+        raise error
 
     sock.settimeout(TCP_TIMEOUT)
 
@@ -39,7 +40,7 @@ def callback_func(out_dict, extra_prms=None):
             if not data:
                 break
             response += data
-        except socket.timeout:
+        except timeout:
             print 'Socket timeout'
             sock.close()
             
@@ -51,5 +52,5 @@ def callback_func(out_dict, extra_prms=None):
 
         impath_sender = context.socket(zmq.REQ)
         impath_sender.connect(extra_prms['zmq_impath_return_ch'])
-        impath_sender.send(out_dict['clean_fn'])
+        impath_sender.send(str(out_dict['clean_fn']))
         impath_sender.recv()
