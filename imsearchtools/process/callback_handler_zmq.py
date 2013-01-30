@@ -3,14 +3,12 @@
 """
 Module: callback_handler
 Author: Ken Chatfield <ken@robots.ox.ac.uk>
-        Kevin McGuinness <kevin.mcguinness@eeng.dcu.ie>
 Created on: 20 Oct 2012
 """
 
 import logging
 from gevent_zeromq import zmq
 import random
-from time import sleep
 
 class ProcType:
     multiprocessing = 1

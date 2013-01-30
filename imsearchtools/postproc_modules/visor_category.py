@@ -48,9 +48,14 @@ def callback_func(out_dict, extra_prms=None):
 
     # return URL on ZMQ channel if specified in extra_prms
     if 'zmq_impath_return_ch' in extra_prms:
-        context = zmq.Context()
+        try:
+            context = zmq.Context()
 
-        impath_sender = context.socket(zmq.REQ)
-        impath_sender.connect(extra_prms['zmq_impath_return_ch'])
-        impath_sender.send(str(out_dict['clean_fn']))
-        impath_sender.recv()
+            impath_sender = context.socket(zmq.REQ)
+            impath_sender.connect(extra_prms['zmq_impath_return_ch'])
+            impath_sender.send(str(out_dict['clean_fn']))
+            impath_sender.recv()
+
+        finally:
+            impath_sender.close()
+            context.term()
