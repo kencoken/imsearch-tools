@@ -16,7 +16,6 @@ Installation Instructions
      - `pil` (Python Imaging Library)
      - `numpy`
      - `scipy`
-     - `pyzmq` (ZeroMQ)
      - `flask` (*only if using HTTP server interface*)
  + Add `imsearchtools` directory to your `PYTHON_PATH`
  + Update `api_credentials.py` in the `/imsearchtools/engines` directory with appropriate

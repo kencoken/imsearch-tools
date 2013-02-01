@@ -115,7 +115,10 @@ class CallbackHandler(object):
         log.debug('Forcefully terminating result manager')
         self.result_manager.terminate()
         log.debug('Forcefully terminating workers')
-        self.workers.terminate()
+        if PROC_TYPE == ProcType.greenlet:
+            self.workers.kill()
+        else:
+            self.workers.terminate()
         log.debug('Done terminating!')
 
 class CallbackTaskRunner(object):
