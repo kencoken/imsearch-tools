@@ -43,14 +43,23 @@ class CallbackHandler(object):
         self.worker_func = worker_func
 
     def run_callback(self, *args, **kwargs):
+        blocking = kwargs.get('blocking', False)
+        if 'blocking' in kwargs:
+            del kwargs['blocking']
+        
         #log.debug('Starting task for file: %s', out_dict['clean_fn'])
         if not self.worker_pool_closed:
             log.debug('Starting task')
             worker_params = dict(args=args,
                                  kwargs=kwargs)
             # spawn worker through greenlet, so function does not block when pool is full
-            spawn_func = lambda self, worker_params: self.worker_pool.spawn(self._callback_func, worker_params)
-            gevent.spawn(spawn_func, self, worker_params)
+            #spawn_func = lambda self, worker_params: self.worker_pool.spawn(self._callback_func, worker_params)
+            callback_launch_greenlet = gevent.spawn(self._spawn_callback,
+                                                    worker_params,
+                                                    blocking=blocking)
+
+            if blocking:
+                callback_launch_greenlet.join()
         
 
     def skip(self):
@@ -73,6 +82,15 @@ class CallbackHandler(object):
         self.worker_pool.join()
         log.debug('Done terminating!')
 
+    def _spawn_callback(self, worker_params, blocking=False):
+        # spawn also waits, but want to check worker_pool_closed immediately
+        # before launch, so do this manually
+        self.worker_pool.wait_available()
+        if not self.worker_pool_closed:
+            callback_greenlet = self.worker_pool.spawn(self._callback_func, worker_params)
+            if blocking:
+                callback_greenlet.join()
+        
     def _callback_func(self, worker_params):
         self.worker_func(*worker_params['args'], **worker_params['kwargs'])
         self._dec_task_count_completed()

@@ -79,9 +79,9 @@ class ImageGetter(ImageProcessor):
             if call_completion_func:
                 # use callback handler to run completion func configured in process_urls
                 if completion_extra_prms:
-                    self._callback_handler.run_callback(out_dict, completion_extra_prms)
+                    self._callback_handler.run_callback(out_dict, completion_extra_prms, blocking=True)
                 else:
-                    self._callback_handler.run_callback(out_dict)
+                    self._callback_handler.run_callback(out_dict, blocking=True)
 
             return out_dict
         else:
@@ -153,12 +153,12 @@ class ImageGetter(ImageProcessor):
             # detect if timeout occurred by iterating through jobs and using 'get', which
             # will re-raise the Timeout exception for any jobs
             timeout_occurred = False
-            try:
-                for job in jobs:
+            for job in jobs:
+                try:
                     job.get(block=False)
-            except Timeout:
-                timeout_occurred = True
-                log.info('Timeout occurred when processing jobs')
+                except Timeout:
+                    job.kill(block=True)
+                    timeout_occurred = True
 
             # only wait for callback handler if timeout didn't occur
             # (as timeout will cause uncompleted gevent jobs to be forcibly ended
@@ -166,6 +166,7 @@ class ImageGetter(ImageProcessor):
             if not timeout_occurred:
                 self._callback_handler.join()
             else:
+                log.info('Timeout occurred when processing jobs')
                 self._callback_handler.terminate()
 
         # construct return list of filenames
