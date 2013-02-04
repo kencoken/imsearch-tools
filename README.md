@@ -11,12 +11,15 @@ Copyright 2010-2013, all rights reserved.
 Installation Instructions
 -------------------------
  + Install the following Python dependencies:
-     - `gevent`
+     - `gevent` (1.0 RC2 or above required, available on
+                 [github](https://github.com/SiteSupport/gevent/downloads))
      - `requests`
      - `pil` (Python Imaging Library)
      - `numpy`
      - `scipy`
      - `flask` (*only if using HTTP server interface*)
+     - `zmq` and `gevent-zeromq` (*only if using the `visor-category`
+                                  post-processing module*)
  + Add `imsearchtools` directory to your `PYTHON_PATH`
  + Update `api_credentials.py` in the `/imsearchtools/engines` directory with appropriate
    API keys for each method you plan to use. Some example keys are provided (commented out)
@@ -157,6 +160,18 @@ The callbacks will be executed using a pool of worker processes, the size of whi
 determined by the `completion_worker_count` parameter. If it is not specified, by default
 *N* workers will be launched where *N* is the number of CPUs on the local system.
 
+#### Notes about callbacks
+
+Callbacks do not run in a separate CPU thread or process, but rather in the same thread
+as the rest of the code in a gevent 'greenlet'. Greenlets allow many I/O bound operations
+to run in parallel, but CPU-intensive code will cause problems as the main thread will
+remain stuck in the callback giving very little CPU time to the module code.
+
+As a result, callbacks should be restricted to code which *can be I/O intensive, but is
+not CPU intensive* and is generally as short as possible. If CPU-intensive code must be
+run, this can be achieved by using the callback to communicate with a separate 'runner'
+process via TCP/IP / pipes / ZMQ etc. to launch the code.
+
 HTTP Service
 ------------
 
@@ -228,6 +243,8 @@ example in `example_textlog_module.py` for the required format of the module fil
 Revision History
 ----------------
 
+ + *Feb 2013*
+     - Switched to pure gevent-based callbacks and fixed bugs in callback code
  + *Jan 2013*
      - Fixed issue with timeout by migrating from `restkit` to `requests` library
      - Added missing `gevent` monkey-patching to provide speed boost
