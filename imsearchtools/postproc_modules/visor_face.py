@@ -14,8 +14,8 @@ def callback_func(out_dict, extra_prms=None):
     #    print 'Connect failed', msg
     #    raise error
     backed_server = Pyro4.Proxy("PYRONAME:face_retrieval_backend_v0")
-    #backed_server._pyroOneway.add("add_pos_trs")
-    backed_server.add_pos_trs(extra_prms['query_id'], out_dict['orig_fn'])
+    backed_server._pyroOneway.add("add_pos_trs")
+    backed_server.add_pos_trs(extra_prms['query_id'], out_dict['clean_fn'],'')
                                          
     
     # return URL on ZMQ channel if specified in extra_prms
