@@ -43,9 +43,8 @@ class CallbackHandler(object):
         self.worker_func = worker_func
 
     def run_callback(self, *args, **kwargs):
-        blocking = kwargs.get('blocking', False)
-        if 'blocking' in kwargs:
-            del kwargs['blocking']
+        # pop off keyword parameters from kwargs
+        blocking = kwargs.pop('blocking', False)
         
         #log.debug('Starting task for file: %s', out_dict['clean_fn'])
         if not self.worker_pool_closed:
