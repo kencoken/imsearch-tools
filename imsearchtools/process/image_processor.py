@@ -77,12 +77,11 @@ class ImageProcessor(object):
         return clean_fn
 
     def _thumb_filename_from_filename(self, fn):
-        fmt = '{}{}-{}x{}.{}'
         name = os.path.splitext(fn)[0]
         suffix = self.opts.thumbnail['suffix']
         width, height = self.opts.thumbnail['width'], self.opts.thumbnail['height']
         extension = self.opts.thumbnail['format'].lower()
-        thumb_fn = fmt.format(name, suffix, width, height, extension)
+        thumb_fn = '%s%s-%dx%d.%s' % (name, suffix, width, height, extension)
         if self.opts.thumbnail['subdir']:
             thumb_fn = os.path.join(self.opts.thumbnail['subdir'], thumb_fn)
         return thumb_fn
