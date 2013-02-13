@@ -24,7 +24,7 @@ def callback_func(out_dict, extra_prms=None):
     func_in = dict(func=extra_prms['func'],
                    query_id=extra_prms['query_id'],
                    impath=out_dict['clean_fn'],
-                   featpath=extra_prms['featpath'],
+                   featpath=extra_prms['featdir'],
 		   extra_params=dict(from_dataset=0)
 		   )
     request = json.dumps(func_in)
