@@ -20,10 +20,12 @@ def callback_func(out_dict, extra_prms=None):
     sock.settimeout(TCP_TIMEOUT)
 
     # construct VISOR backend function call
+    # pass complete feature path at later stage
     func_in = dict(func=extra_prms['func'],
                    query_id=extra_prms['query_id'],
                    impath=out_dict['clean_fn'],
-                   from_dataset=0)
+                   featpath=extra_prms['featdir'],
+		   extra_params=dict(from_dataset=0))
     request = json.dumps(func_in)
     
     print 'Request to VISOR backend: ' + request
