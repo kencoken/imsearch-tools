@@ -25,7 +25,8 @@ def callback_func(out_dict, extra_prms=None):
                    query_id=extra_prms['query_id'],
                    impath=out_dict['clean_fn'],
                    featpath=extra_prms['featdir'],
-		   extra_params=dict(from_dataset=0))
+                   from_dataset=0,
+		   extra_params=dict())
     request = json.dumps(func_in)
     
     print 'Request to VISOR backend: ' + request
