@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+import os
 from socket import *
 from flask import json
 from gevent_zeromq import zmq
@@ -19,12 +20,16 @@ def callback_func(out_dict, extra_prms=None):
 
     sock.settimeout(TCP_TIMEOUT)
 
+    # generate feature file path from image file path
+    imfn = os.path.basename(out_dict['clean_fn'])
+    (featfn, imext) = os.path.splitext(imfn)
+    featfn += '.bin'
+    featpath = os.path.join(extra_prms['featdir'], featfn)
     # construct VISOR backend function call
-    # pass complete feature path at later stage
     func_in = dict(func=extra_prms['func'],
                    query_id=extra_prms['query_id'],
                    impath=out_dict['clean_fn'],
-                   featpath=extra_prms['featdir'],
+                   featpath=featpath,
                    from_dataset=0,
 		   extra_params=dict())
     request = json.dumps(func_in)
