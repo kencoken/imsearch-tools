@@ -7,7 +7,8 @@ def get_module_callback(module_name):
         module = __import__(module_name, globals=globals())
         callback_func = module.callback_func
     except ImportError:
-        raise ImportError("Could not find postproc module with name: '%s'" % module_name)
+        avail_modules = get_module_list()
+        raise ImportError("Could not find postproc module with name: '%s' (available modules are %s)" % (module_name, avail_modules))
     except AttributeError:
         raise AttributeError("Postproc module with name '%s' did not contain required 'callback_func(out_dict)' function" % module_name)
 

@@ -8,6 +8,7 @@ Created on: 29 Jan 2013
 
 import logging
 import gevent
+from gevent import pool
 import time
 from multiprocessing import cpu_count
 
@@ -36,7 +37,7 @@ class CallbackHandler(object):
         # if number of workers is not specified, set it to the number of CPUs
         if worker_count == -1:
             worker_count = cpu_count()
-        self.worker_pool = gevent.pool.Pool(size=worker_count)
+        self.worker_pool = pool.Pool(size=worker_count)
         self.worker_pool_closed = False
         # store requested task count and callback function
         self.task_count = task_count
