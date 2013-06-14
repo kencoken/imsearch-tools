@@ -76,7 +76,7 @@ class BingAPISearch(requests.Session, SearchClient):
             if DEBUG_MESSAGES:
                 print json.dumps(result_dict)
 
-            return result_dict['d']['results']
+            return result_dict['d']['results'][:(num_results-result_offset)]
         except requests.exceptions.RequestException, e:
             if DEBUG_MESSAGES:
                 print str(e)

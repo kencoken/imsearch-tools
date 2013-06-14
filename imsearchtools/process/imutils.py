@@ -8,8 +8,7 @@ Created on: 19 Oct 2012
 """
 
 import numpy as np
-#import skimage.io
-import scipy.misc
+from PIL import Image as PILImage
 import math
 
 def image_exists(fn):
@@ -20,15 +19,16 @@ def image_exists(fn):
     return True
 
 def load_image(fn):
-    #return skimage.io.imread(fn)
-    return scipy.misc.imread(fn)
+    im= PILImage.open(fn)
+    if im.mode != "RGB":
+        im = im.convert("RGB")
+    return im
 
 def save_image(fn, im):
-    #skimage.io.imsave(fn, im)
-    return scipy.misc.imsave(fn, im)
+    im.save(fn)
 
 def downsize_by_max_dims(im, shape=(10000,10000)):
-    h, w = im.shape[:2]
+    h, w = im.size
     sf = 1.0
     if h > shape[0]:
         sf = float(shape[0])/h
@@ -37,26 +37,26 @@ def downsize_by_max_dims(im, shape=(10000,10000)):
         if sf2 < sf:
             sf = sf2
     if sf < 1.0:
-        resized = scipy.misc.imresize(im, sf)
+        resized = im.resize((int(sf*h), int(sf*w)), PILImage.ANTIALIAS )
         return resized
     else:
         return im
         
 
 def create_thumbnail(im, shape=(128,128), pad_to_size=True):
-    h, w = im.shape[:2]
+    h, w = im.size
     if w > h:
         nw = shape[1]
         nh = int(nw * (h / float(w)))
     else:
         nh = shape[0]
         nw = int(nh * (w / float(h)))
-    resized = scipy.misc.imresize(im, (nh, nw))
+    resized = im.resize((nh, nw), PILImage.ANTIALIAS )
     if pad_to_size:
-        thumbnail = np.zeros(shape + im.shape[2:], dtype=im.dtype)
+        thumbnail = PILImage.new('RGB', shape)
         cx = int((shape[1] - nw) / 2.0)
         cy = int((shape[0] - nh) / 2.0)
-        thumbnail[cy:cy+nh,cx:cx+nw,...] = resized
+        thumbnail.paste(resized, (cy,cx))
         return thumbnail
     else:
         return resized

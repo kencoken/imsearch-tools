@@ -64,7 +64,7 @@ class FlickrAPISearch(requests.Session, SearchClient):
             # extract list of results from response
             result_dict = resp.json()
 
-            return result_dict['photos']['photo']
+            return result_dict['photos']['photo'][:(num_results-result_offset)]
 
         except requests.exceptions.RequestException:
             return []

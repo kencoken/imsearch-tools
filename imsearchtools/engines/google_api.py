@@ -66,7 +66,7 @@ class GoogleAPISearch(requests.Session, SearchClient):
             # extract list of results from response
             result_dict = resp.json()
 
-            return result_dict['items']
+            return result_dict['items'][:(num_results-result_offset)]
 
         except requests.exceptions.RequestException:
             return []

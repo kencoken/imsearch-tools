@@ -59,8 +59,8 @@ class GoogleWebSearch(requests.Session, SearchClient):
                             params=aux_params, headers=headers)
 
             resp_str = resp.text
-            image_urls = image_url_pattern.findall(resp_str)
-            image_ids = image_id_pattern.findall(resp_str)
+            image_urls = image_url_pattern.findall(resp_str)[:(num_results-result_offset)]
+            image_ids = image_id_pattern.findall(resp_str)[:(num_results-result_offset)]
 
             resp_dict = [{'url': item[0],
                           'image_id': md5(item[1]).hexdigest()} for item in zip(image_urls, image_ids)]
