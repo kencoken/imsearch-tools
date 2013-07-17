@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-import os
+import os, sys
 
 from flask import Flask, request, Response, url_for
 from gevent.wsgi import WSGIServer
@@ -13,7 +13,7 @@ from imsearchtools import postproc_modules
 import logging
 logging.basicConfig()
 
-SERVER_PORT = 8150
+DEFAULT_SERVER_PORT = 8150
 SUPPORTED_ENGINES = ['bing_api', 'google_old_api', 'google_api', 'google_web', 'flickr_api']
 
 app = Flask(__name__)
@@ -202,6 +202,11 @@ def exec_pipeline():
         return 'DONE'
 
 if __name__ == '__main__':
+    if len(sys.argv)>1:
+        SERVER_PORT = int(sys.argv[1])
+    else:
+        SERVER_PORT = DEFAULT_SERVER_PORT
+    print "Starting imsearch_http_service on port", SERVER_PORT
     http_server = WSGIServer(('', SERVER_PORT), app)
     http_server.serve_forever()
     

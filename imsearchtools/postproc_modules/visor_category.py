@@ -14,9 +14,9 @@ def callback_func(out_dict, extra_prms=None):
     sock = socket(AF_INET, SOCK_STREAM)
     try:
         sock.connect((extra_prms['backend_host'], extra_prms['backend_port']))
-    except error, msg:
-        print 'Connect failed', msg
-        raise error
+    except Error, e:
+        print 'Connect failed', str(e)
+        raise e
 
     sock.settimeout(TCP_TIMEOUT)
 
