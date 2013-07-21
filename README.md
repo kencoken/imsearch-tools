@@ -8,6 +8,8 @@ Authors:
 
 Copyright 2010-2013, all rights reserved.
 
+Release: v1.1 (July 2013)
+
 Installation Instructions
 -------------------------
  + Install the following Python dependencies:
