@@ -19,7 +19,7 @@ def image_exists(fn):
     return True
 
 def load_image(fn):
-    im= PILImage.open(fn)
+    im = PILImage.open(fn)
     if im.mode != "RGB":
         im = im.convert("RGB")
     return im
@@ -28,7 +28,7 @@ def save_image(fn, im):
     im.save(fn)
 
 def downsize_by_max_dims(im, shape=(10000,10000)):
-    h, w = im.size
+    w, h = im.size
     sf = 1.0
     if h > shape[0]:
         sf = float(shape[0])/h
@@ -37,21 +37,16 @@ def downsize_by_max_dims(im, shape=(10000,10000)):
         if sf2 < sf:
             sf = sf2
     if sf < 1.0:
-        resized = im.resize((int(sf*h), int(sf*w)), PILImage.ANTIALIAS )
+        resized = im.resize((int(sf*w), int(sf*h)), PILImage.ANTIALIAS)
         return resized
     else:
         return im
         
 
 def create_thumbnail(im, shape=(128,128), pad_to_size=True):
-    h, w = im.size
-    if w > h:
-        nw = shape[1]
-        nh = int(nw * (h / float(w)))
-    else:
-        nh = shape[0]
-        nw = int(nh * (w / float(h)))
-    resized = im.resize((nh, nw), PILImage.ANTIALIAS )
+    resized = downsize_by_max_dims(im, shape)
+    nw, nh = im.size
+    resized = im.resize((nw, nh), PILImage.ANTIALIAS)
     if pad_to_size:
         thumbnail = PILImage.new('RGB', shape)
         cx = int((shape[1] - nw) / 2.0)
