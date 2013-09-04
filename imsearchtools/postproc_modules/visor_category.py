@@ -5,6 +5,9 @@ from socket import *
 from flask import json
 from gevent_zeromq import zmq
 
+import logging
+log = logging.getLogger(__name__)
+
 TCP_TERMINATOR = "$$$"
 SUCCESS_FIELD = "success"
 TCP_TIMEOUT = 86400.00
@@ -56,14 +59,29 @@ def callback_func(out_dict, extra_prms=None):
 
     # return URL on ZMQ channel if specified in extra_prms
     if 'zmq_impath_return_ch' in extra_prms:
+        created_sock = True
         try:
-            context = zmq.Context()
+            # either reuse or create new zmq socket
+            if 'zmq_impath_return_sock' not in extra_prms:
+                # either reuse or create new zmq context
+                # (to create socket)
+                if 'zmq_context' in extra_prms:
+                    log.info('Reusing ZMQ_CONTEXT')
+                    context = extra_prms['zmq_context']
+                else:
+                    log.info('Generating new ZMQ_CONTEXT')
+                    context = zmq.Context()
 
-            impath_sender = context.socket(zmq.REQ)
-            impath_sender.connect(extra_prms['zmq_impath_return_ch'])
+                impath_sender = context.socket(zmq.REQ)
+                impath_sender.connect(extra_prms['zmq_impath_return_ch'])
+            else:
+                created_sock = False
+                log.info('Reusing ZMQ_SOCKET')
+                impath_sender = extra_prms['zmq_impath_return_sock']
+
             impath_sender.send(str(out_dict['clean_fn']))
             impath_sender.recv()
+            log.info('Completed request')
 
         finally:
-            impath_sender.close()
-            context.term()
+            if created_sock: impath_sender.close()

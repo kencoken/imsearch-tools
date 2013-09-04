@@ -83,6 +83,7 @@ class ImageGetter(ImageProcessor):
                 else:
                     self._callback_handler.run_callback(out_dict, blocking=True)
 
+            log.info('done with callback')
             return out_dict
         else:
             if call_completion_func:
@@ -147,6 +148,7 @@ class ImageGetter(ImageProcessor):
 
         # wait for all URL processor jobs to complete
         gevent.joinall(jobs, timeout=self.timeout)
+        log.info('all process_url jobs joined!')
 
         # if using callbacks, wait for all callbacks to complete before continuing
         if completion_func:
