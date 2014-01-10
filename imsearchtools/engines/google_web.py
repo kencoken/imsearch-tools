@@ -50,7 +50,8 @@ class GoogleWebSearch(requests.Session, SearchClient):
         #    num_results = self._results_per_req
         image_div_pattern = re.compile(r'<div class="rg_di"(.*?)</div>')
         image_url_pattern = re.compile(r'imgurl=(.*?)&')
-        image_id_pattern = re.compile(r'id":"(.*?):')
+        #image_id_pattern = re.compile(r'id":"(.*?):')
+        image_id_pattern = re.compile(r'name=(.*?):')
             
         try:
             page_idx = int(math.floor(result_offset/float(self._results_per_req)))
