@@ -87,7 +87,8 @@ class GoogleWebSearch(requests.Session, SearchClient):
 
             # package for output
             resp_dict = [{'url': item[0],
-                          'image_id': md5(item[1]).hexdigest()} for item in image_data]
+                          'image_id': md5(item[1]).hexdigest(),
+                          'rank': result_offset+index+1} for index, item in enumerate(image_data)]
 
             return resp_dict
         except requests.exceptions.RequestException:

@@ -158,7 +158,7 @@ class ImageGetter(ImageProcessor):
             for job in jobs:
                 try:
                     job.get(block=False)
-                except Timeout:
+                except Timeout, IndexError:
                     job.kill(block=True)
                     timeout_occurred = True
 
