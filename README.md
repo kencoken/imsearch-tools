@@ -6,9 +6,9 @@ Authors:
  + Ken Chatfield, University of Oxford – <ken@robots.ox.ac.uk>
  + Kevin McGuinness, Dublin City University – <kevin.mcguinness@eeng.dcu.ie>
 
-Copyright 2010-2013, all rights reserved.
+Copyright 2010-2014, all rights reserved.
 
-Release: v1.1 (July 2013)
+Release: v1.2 (June 2014)
 
 Installation Instructions
 -------------------------
@@ -24,10 +24,7 @@ Installation Instructions
                                   post-processing module*)
  + Add `imsearchtools` directory to your `PYTHON_PATH`
  + Update `api_credentials.py` in the `/imsearchtools/engines` directory with appropriate
-   API keys for each method you plan to use. Some example keys are provided (commented out)
-   which can be used for quick validation, but these are my personal keys so it would be
-   *greatly appreciated* if you could secure your own using the methods described in the
-   section below if you will be using the API-based engines extensively.
+   API keys for each method you plan to use.
    
 Usage Instructions
 ------------------
@@ -245,6 +242,8 @@ example in `example_textlog_module.py` for the required format of the module fil
 Revision History
 ----------------
 
+ + *May 2014*
+     - Fixed `google-web` engine to work with updated Google search page
  + *Feb 2013*
      - Switched to pure gevent-based callbacks and fixed bugs in callback code
  + *Jan 2013*
