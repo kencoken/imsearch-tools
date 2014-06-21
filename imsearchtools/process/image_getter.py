@@ -9,9 +9,15 @@ Created on: 19 Oct 2012
 
 import gevent
 from gevent.timeout import Timeout
-import requests
+
+from gevent import monkey; monkey.patch_socket()
+import urllib2
+from httplib import BadStatusLine
+
+#import requests
 import os
 import urlparse
+import time
 
 from image_processor import *
 import imutils
@@ -42,26 +48,21 @@ class ImageGetter(ImageProcessor):
         self.subprocs = []
 
     def process_url(self, urldata, output_dir, call_completion_func=False,
-                    completion_extra_prms=None):
+                    completion_extra_prms=None, start_time=0):
         error_occurred = False
         try:
             output_fn = os.path.join(output_dir, self._filename_from_urldata(urldata))
             self._download_image(urldata['url'], output_fn)
             clean_fn, thumb_fn = self.process_image(output_fn)
-        except requests.RequestException, e:
-            log.info('Request exception for %s (%s)', urldata['url'], str(e))
+        except urllib2.URLError, e:
+            log.info('URL Error for %s (%s)', urldata['url'], str(e))
             error_occurred = True
-        except requests.ConnectionError, e:
-            log.info('Connection error for %s (%s)', urldata['url'], str(e))
-            error_occurred = True
-        except requests.HTTPError, e:
-            log.info('HTTP error for %s (%s)', urldata['url'], str(e))
-            error_occurred = True
-        except requests.URLRequired, e:
-            log.info('URL required error for %s (%s)', urldata['url'], str(e))
-            error_occurred = True
-        except requests.TooManyRedirects, e:
-            log.info('Too many redirects error for %s (%s)', urldata['url'], str(e))
+        except urllib2.HTTPError, e:
+            if e.code != 201:
+                log.info('HTTP Error for %s (%s)', urldata['url'], str(e))
+                error_occurred = True
+        except BadStatusLine, e:
+            log.info('Bad status line for %s (%s)', urldata['url'], str(e))
             error_occurred = True
         except IOError, e:
             log.info('IO Error for: %s (%s)', urldata['url'], str(e))
@@ -75,6 +76,8 @@ class ImageGetter(ImageProcessor):
             out_dict['orig_fn'] = output_fn
             out_dict['clean_fn'] = clean_fn
             out_dict['thumb_fn'] = thumb_fn
+            if start_time > 0:
+                out_dict['download_time'] = time.time() - start_time
 
             if call_completion_func:
                 # use callback handler to run completion func configured in process_urls
@@ -98,11 +101,11 @@ class ImageGetter(ImageProcessor):
             return
 
         log.info('Downloading URL: %s', url)
-        resp = requests.get(url, headers=self.headers, timeout=self.image_timeout)
-        resp.raise_for_status()
-        
+        request = urllib2.Request(url, headers=self.headers)
+        r = urllib2.urlopen(request, timeout=self.image_timeout)
+
         with open(output_fn, 'w') as f:
-            f.write(resp.content)
+            f.write(r.read())
         
     def process_urls(self, urls, output_dir, completion_func=None,
                      completion_worker_count=-1, completion_extra_prms=None):
@@ -143,7 +146,8 @@ class ImageGetter(ImageProcessor):
         jobs = [gevent.spawn(self.process_url,
                              urldata, output_dir,
                              call_completion_func=(completion_func is not None),
-                             completion_extra_prms=completion_extra_prms)
+                             completion_extra_prms=completion_extra_prms,
+                             start_time=time.time())
                 for urldata in urls]
 
         # wait for all URL processor jobs to complete
