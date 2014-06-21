@@ -8,7 +8,7 @@ Authors:
 
 Copyright 2010-2014, all rights reserved.
 
-Release: v1.2 (June 2014)
+Release: v1.2.1 (June 2014)
 
 Installation Instructions
 -------------------------
@@ -242,7 +242,10 @@ example in `example_textlog_module.py` for the required format of the module fil
 Revision History
 ----------------
 
- + *May 2014*
+ + *Jun 2014* (1.2.1)
+     - Switched from `requests` library for downloader to monkey-patched `urllib2`
+	   to make gevent greenlets work properly
+ + *May 2014* (1.2)
      - Fixed `google-web` engine to work with updated Google search page
  + *Feb 2013*
      - Switched to pure gevent-based callbacks and fixed bugs in callback code
