@@ -70,7 +70,7 @@ class BingAPISearch(requests.Session, SearchClient):
             resp = self.get(BING_API_ENTRY + BING_API_FUNC, params=aux_params,
                             headers=headers)
             resp.raise_for_status()
-
+            
             # extract list of results from response
             result_dict = resp.json()
             if DEBUG_MESSAGES:
@@ -78,8 +78,7 @@ class BingAPISearch(requests.Session, SearchClient):
 
             return result_dict['d']['results'][:(num_results-result_offset)]
         except requests.exceptions.RequestException, e:
-            if DEBUG_MESSAGES:
-                print str(e)
+            print 'error occurred: ' + str(e)
             return []
 
     def __bing_results_to_results(self, results):
