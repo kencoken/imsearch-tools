@@ -119,4 +119,4 @@ def callback_func(out_dict, extra_prms=None):
         finally:
             if created_sock: impath_sender.close()
     else:
-        log.innfo('Not returning image URL over ZMQ channel (not specified)')
+        log.info('Not returning image URL over ZMQ channel (not specified)')
