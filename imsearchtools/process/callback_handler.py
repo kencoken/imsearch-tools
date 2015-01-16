@@ -60,7 +60,7 @@ class CallbackHandler(object):
 
             if blocking:
                 callback_launch_greenlet.join()
-        
+
 
     def skip(self):
         log.debug('Skipping task')
@@ -69,11 +69,29 @@ class CallbackHandler(object):
     def join(self):
         # waiting for all tasks to complete
         log.debug('Waiting all tasks to be completed...')
+
+        last_task_count = self.task_count
+        last_task_elapsed = 0.0
+        task_wait_timed_out = False
+
         while self.task_count > 0:
+            if last_task_count > self.task_count:
+                last_task_count = self.task_count
+                last_task_elapsed = 0.0
             time.sleep(0.05)
+            last_task_elapsed = last_task_elapsed + 0.05
+            if last_task_elapsed > 1.5:
+                task_wait_timed_out = True
+                break
+
         self.worker_pool_closed = True
+        if task_wait_timed_out:
+            self.worker_pool.kill()
         self.worker_pool.join()
-        log.debug('All tasks completed!')
+        if task_wait_timed_out:
+            log.debug('All tasks completed! (Timed out)')
+        else:
+            log.debug('All tasks completed!')
 
     def terminate(self):
         log.debug('Terminating workers early...')
