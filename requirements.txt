@@ -1,0 +1,8 @@
+gevent
+requests
+pil
+numpy
+scipy
+flask
+pyzmq
+gevent-zeromq
