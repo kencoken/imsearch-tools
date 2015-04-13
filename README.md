@@ -6,26 +6,23 @@ Authors:
  + Ken Chatfield, University of Oxford – <ken@robots.ox.ac.uk>
  + Kevin McGuinness, Dublin City University – <kevin.mcguinness@eeng.dcu.ie>
 
-Copyright 2010-2014, all rights reserved.
+Copyright 2010-2015, all rights reserved.
 
-Release: v1.2.1 (June 2014)
+Release: v1.2.2 (April 2015)
 
 Installation Instructions
 -------------------------
- + Install the following Python dependencies:
-     - `gevent` (1.0 RC2 or above required, available on
-                 [github](https://github.com/SiteSupport/gevent/downloads))
-     - `requests`
-     - `pil` (Python Imaging Library)
-     - `numpy`
-     - `scipy`
-     - `flask` (*only if using HTTP server interface*)
-     - `zmq` and `gevent-zeromq` (*only if using the `visor-category`
-                                  post-processing module*)
+
+First install all Python dependencies using:
+
+    $ python install -r requirements.txt
+
+Following this:
+
  + Add `imsearchtools` directory to your `PYTHON_PATH`
  + Update `api_credentials.py` in the `/imsearchtools/engines` directory with appropriate
    API keys for each method you plan to use.
-   
+
 Usage Instructions
 ------------------
 
@@ -40,7 +37,7 @@ Usage Instructions
      {'image_id': 'cfd0ae160c4de2ebbd4b71fd9254d6df',
       'url': 'http://asset0.cbsistatic.com/cnwk.1d/i/tim/2012/08/15/35414204_620x433.jpg'},
      … ]
-     
+
 Currently the following search services are supported:
 
  + **GoogleWebSearch( )** – Image search using Google, extracted direct from the web
@@ -68,7 +65,7 @@ Currently the following search services are supported:
      - Provides text search of Flickr photos by associated tags
      - Details and authentication key available at:
        <http://www.flickr.com/services/api/>
-       
+
 A test script `query_test.py` is provided which can be used to visualize the difference
 between the methods:
 
@@ -106,12 +103,12 @@ images which were successfully downloaded:
  + `clean_fn` is the path to a verified copy of `orig_fn`, which has been standardized
    according to the class options
  + `thumb_fn` is the path to a thumbnail version of `orig_fn`
- 
+
 A test script `download_test.py` is provided which can be used to demonstrate the usage of
 the `process.ImageGetter()` class:
 
     $ python download_test.py
-    
+
 #### Configuring verification and download settings
 
 Options for image verification and thumbnail generation can be customized by passing an
@@ -128,7 +125,7 @@ initialization e.g.:
     >> opts.thumbnail['width'] = 50
     >> opts.thumbnail['pad_to_size'] = False # don't add padding to thumbnails
     >> getter = imsearchtools.process.ImageGetter(opts)
-    
+
 #### Adding a callback for post image download
 
 Optionally, a callback function can be added which will be called immediately after each
@@ -136,22 +133,22 @@ image is downloaded and processed when using `process.ImageGetter.process_urls()
 do this, specify the callback when calling `process_urls()`:
 
     import imsearchtools
-    
+
     def callback_func(out_dict, extra_prms=None):
         import json
-	print extra_prms['extra_data']
+        print extra_prms['extra_data']
         print json.dumps(out_dict)
         sleep(0.1)
-    
+
     google_searcher = imsearchtools.query.GoogleWebSearch()
     results = google_searcher.query('car')
-    
+
     getter = imsearchtools.process.ImageGetter()
     getter.process_urls(results, '/path/to/save/images',
                         completion_func=callback_func,
-			completion_extra_prms={'extra_data':'hello'},
+                        completion_extra_prms={'extra_data':'hello'},
                         completion_worker_count=8)
-                        
+
 The form of the callback should be `f(out_dict)` where `out_dict` is a dictionary of the
 same form as a single entry in the list returned from `process_urls()`.
 
@@ -192,7 +189,7 @@ For basic usage, the following function calls are provided:
        (e.g. `google_web`, `google_api` etc.)
 
 #### Callbacks and advanced usage
-       
+
 As a callback function cannot be passed directly to the HTTP service, the concept of
 *post-processing modules* has been introduced. These are a collection of pre-prepared
 python scripts containing a callback function of the required format and which exist
@@ -201,7 +198,7 @@ and any of them can be specified to run after each image has been downloaded.
 
 For this functionality, and for more advanced usage (for example, to specify timeouts)
 the following functions can be used:
- 
+
  + `exec_pipeline` `POST`
      - Execute both the query and download stages with advanced options including
        support for callbacks. All of the parameters of the `query` function above
@@ -214,18 +211,18 @@ the following functions can be used:
            + `custom_local_path` – by default images are stored in the `static/` subdirectory
              of the server and URLs are returned (e.g. `http://server.com/static/result.jpg`).
              If this parameter is specified, a different path on the local system is used
-	     instead and the paths returned are local paths instead of URLs (e.g.
+             instead and the paths returned are local paths instead of URLs (e.g.
              `/my/custom/folder/result.jpg`)
            + `query_timeout` – timeout in seconds for the entire function call
            + `improc_timeout` – timeout in seconds for downloading each image
            + `resize_width` and `resize_height` – if specified, all downloaded images will be
               downsampled so that they are at most of width `resize_width`/height
-	      `resize_height`
+              `resize_height`
            + `return_dfiles_list` – if specified, determines whether the paths to downloaded
              images should be returned (in the same way as the `download` function above) or
              only a shorter acknowledgement string should be returned instead. By default, if
              `postproc_module` has not been specified the full dictionary of paths is
-	     returned, and if it has then only the shorter acknowledgement string is returned
+             returned, and if it has then only the shorter acknowledgement string is returned
  + `get_postproc_module_list` `GET`
      - Returns a list of the names of supported post-processing modules
 
@@ -238,13 +235,15 @@ at the following location:
 
 Any `*.py` file placed in this directory will be used as an additional module. Refer to the
 example in `example_textlog_module.py` for the required format of the module file.
-    
+
 Revision History
 ----------------
 
+ + *Apr 2015* (1.2.2)
+     - Updated python dependencies and added server launch utilities
  + *Jun 2014* (1.2.1)
      - Switched from `requests` library for downloader to monkey-patched `urllib2`
-	   to make gevent greenlets work properly
+       to make gevent greenlets work properly
  + *May 2014* (1.2)
      - Fixed `google-web` engine to work with updated Google search page
  + *Feb 2013*
@@ -262,4 +261,3 @@ Revision History
      - Updated Google web search method due to updates
  + *Nov 2010*
      - Original version with support for Google Image Search API + scraping
- 

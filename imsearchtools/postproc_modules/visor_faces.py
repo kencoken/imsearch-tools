@@ -3,10 +3,7 @@
 import os
 from socket import *
 from flask import json
-#try:
-from gevent_zeromq import zmq
-#except:
-#import zmq.green as zmq
+import zmq.green as zmq
 
 TCP_TERMINATOR = "$$$"
 SUCCESS_FIELD = "success"
@@ -34,11 +31,11 @@ def callback_func(out_dict, extra_prms=None):
                    impath=out_dict['clean_fn'],
                    featpath=featpath,
                    from_dataset=0,
-		   extra_params=dict())
+                   extra_params=dict())
     request = json.dumps(func_in)
-    
+
     print 'Request to VISOR backend: ' + request
-    
+
     request = request + TCP_TERMINATOR
 
     # send request to VISOR backend
@@ -66,7 +63,7 @@ def callback_func(out_dict, extra_prms=None):
     #    except timeout:
     #        print 'Socket timeout'
     #        sock.close()
-            
+
     sock.close()
 
     # return URL on ZMQ channel if specified in extra_prms

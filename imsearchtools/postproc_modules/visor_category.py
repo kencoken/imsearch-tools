@@ -3,7 +3,7 @@
 import os
 from socket import *
 from flask import json
-from gevent_zeromq import zmq
+import zmq.green as zmq
 from time import sleep
 import random
 
@@ -20,7 +20,7 @@ def callback_func(out_dict, extra_prms=None):
 
     debug_cb_id = random.getrandbits(128)
     debug_cb_id = '%032x' % debug_cb_id
-    
+
     log.debug('Connecting to backend (%s)...', debug_cb_id)
     sock.connect((extra_prms['backend_host'], extra_prms['backend_port']))
     log.debug('Connected to backend (%s)', debug_cb_id)
@@ -47,7 +47,7 @@ def callback_func(out_dict, extra_prms=None):
                    impath=out_dict['clean_fn'],
                    featpath=featpath,
                    from_dataset=0,
-		   extra_params=dict())
+                   extra_params=dict())
     request = json.dumps(func_in)
 
     log.info('Prepared request to VISOR backend (%s): %s', debug_cb_id, request)
