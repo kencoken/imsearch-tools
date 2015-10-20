@@ -10,6 +10,8 @@ Copyright 2010-2015, all rights reserved.
 
 Release: v1.2.3 (October 2015)
 
+License: MIT (see LICENSE.md)
+
 Installation Instructions
 -------------------------
 
