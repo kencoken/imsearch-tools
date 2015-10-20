@@ -34,9 +34,9 @@ if test_bing_api:
     print 'Retrieved %d results in %f seconds' % (len(bing_api_results), bing_api_timing)
 
     result_page_gen.gen_results_page(bing_api_results,
-                                       'BingAPISearch()',
-                                       os.path.join(outdir, 'bing_api_results.html'),
-                                       show_in_browser=False)
+                                     'BingAPISearch()',
+                                     os.path.join(outdir, 'bing_api_results.html'),
+                                     show_in_browser=False)
 
     all_results.append(bing_api_results)
     all_generator_names.append('BingAPISearch()')
@@ -50,9 +50,9 @@ if test_google_old_api:
     print 'Retrieved %d results in %f seconds' % (len(google_old_api_results), google_old_api_timing)
 
     result_page_gen.gen_results_page(google_old_api_results,
-                                       'GoogleOldAPISearch()',
-                                       os.path.join(outdir, 'google_old_api_results.html'),
-                                       show_in_browser=False)
+                                     'GoogleOldAPISearch()',
+                                     os.path.join(outdir, 'google_old_api_results.html'),
+                                     show_in_browser=False)
 
     all_results.append(google_old_api_results)
     all_generator_names.append('GoogleOldAPISearch()')
@@ -66,9 +66,9 @@ if test_google_api:
     print 'Retrieved %d results in %f seconds' % (len(google_api_results), google_api_timing)
 
     result_page_gen.gen_results_page(google_api_results,
-                                       'GoogleAPISearch()',
-                                       os.path.join(outdir, 'google_api_results.html'),
-                                       show_in_browser=False)
+                                     'GoogleAPISearch()',
+                                     os.path.join(outdir, 'google_api_results.html'),
+                                     show_in_browser=False)
 
     all_results.append(google_api_results)
     all_generator_names.append('GoogleAPISearch()')
@@ -82,9 +82,9 @@ if test_google_web:
     print 'Retrieved %d results in %f seconds' % (len(google_web_results), google_web_timing)
 
     result_page_gen.gen_results_page(google_web_results,
-                                       'GoogleWebSearch()',
-                                       os.path.join(outdir, 'google_web_results.html'),
-                                       show_in_browser=False)
+                                     'GoogleWebSearch()',
+                                     os.path.join(outdir, 'google_web_results.html'),
+                                     show_in_browser=False)
 
     all_results.append(google_web_results)
     all_generator_names.append('GoogleWebSearch()')
@@ -99,13 +99,13 @@ if test_flickr_api:
     print 'Retrieved %d results in %f seconds' % (len(flickr_api_results), flickr_api_timing)
 
     result_page_gen.gen_results_page(flickr_api_results,
-                                       'FlickrApiSearch()',
-                                       os.path.join(outdir, 'flickr_api_results.html'),
-                                       show_in_browser=False)
+                                     'FlickrApiSearch()',
+                                     os.path.join(outdir, 'flickr_api_results.html'),
+                                     show_in_browser=False)
 
     all_results.append(flickr_api_results)
     all_generator_names.append('FlickrAPISearch()')
 
 if display_results:
     result_page_gen.combine_results_pages(all_results, all_generator_names,
-                                            os.path.join(outdir, 'combined_results.html'))
+                                          os.path.join(outdir, 'combined_results.html'))

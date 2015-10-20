@@ -19,52 +19,45 @@ RESULT_PAGE_HTML = '''
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 <title>Search Result Visualization</title>
 <style>
-	#result_container {
-		
-	}
-	#result_container:after {
-		content: ".";
-		display: block;
-		height: 0;
-		clear: both;
-		visibility: hidden;
-	}
-	.result {
-		float: left;
+  #result_container {
+
+  }
+  #result_container:after {
+    content: ".";
+    display: block;
+    height: 0;
+    clear: both;
+    visibility: hidden;
+  }
+  .result {
+    float: left;
                 padding: 5px;
-	}
-        .result img {
-                height: 130px;
-        }
+  }
+  .result img {
+    height: 130px;
+  }
 </style>
 </head>
 
 <body>
-	<dl>
-    	<dt>Generator:</dt>
-        <dd><!-- GENERATOR --></dd>
-        <dt>Images returned:</dt>
-        <dd><!-- IMAGE_COUNT --></dd>
-    </dl>
-    <div id="result_container">
-        <!-- RESULTS -->
-    </div>
+  <dl>
+    <dt>Generator:</dt>
+    <dd><!-- GENERATOR --></dd>
+    <dt>Images returned:</dt>
+    <dd><!-- IMAGE_COUNT --></dd>
+  </dl>
+  <div id="result_container">
+    <!-- RESULTS -->
+  </div>
 </body>
 </html>
 '''
 
 RESULT_HTML = '''
-    	<div class="result">
-        	<img src="<!-- RESULT_URL -->" alt="<!-- RESULT_TITLE -->" />
-        </div>
+    <div class="result">
+      <img src="<!-- RESULT_URL -->" alt="<!-- RESULT_TITLE -->" />
+    </div>
 '''
-
-
-
-
-
-
-
 
 COMBINED_RESULT_PAGE_HTML = '''
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
@@ -73,63 +66,63 @@ COMBINED_RESULT_PAGE_HTML = '''
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 <title>Search Result Visualization</title>
 <style>
-	#result_frames_container {
+  #result_frames_container {
 
-	}
-        #result_frames_container>div {
-                display: block;
-                float: left;
-                width: 200px;
-                padding: 5px;
-                border: 1px solid black;
-        }
-	#result_frames_container:after {
-		content: ".";
-		display: block;
-		height: 0;
-		clear: both;
-		visibility: hidden;
-	}
-        .result_img_container {
-                height: 250px;
-        }
-        .result_img {
-                max-width: 190px;
-                max-height: 200px;
-        }
+  }
+  #result_frames_container>div {
+    display: block;
+    float: left;
+    width: 200px;
+    padding: 5px;
+    border: 1px solid black;
+  }
+  #result_frames_container:after {
+    content: ".";
+    display: block;
+    height: 0;
+    clear: both;
+    visibility: hidden;
+  }
+  .result_img_container {
+    height: 250px;
+  }
+  .result_img {
+    max-width: 190px;
+    max-height: 200px;
+  }
 </style>
 <script src="http://code.jquery.com/jquery-latest.js"></script>
 </head>
 
 <body>
-    <div id="result_frames_container">
-        <!-- RESULT_FRAMES -->
-    </div>
+  <div id="result_frames_container">
+    <!-- RESULT_FRAMES -->
+  </div>
 </body>
 </html>
 '''
 
 RESULT_FRAME_HTML = '''
-        <div>
-            <!-- RESULT_FRAME_HEADER -->
-            <!-- RESULTS -->
-        </div>
+    <div>
+      <!-- RESULT_FRAME_HEADER -->
+      <!-- RESULTS -->
+    </div>
 '''
 
 RESULT_FRAME_HEADER_HTML = '''
-	<dl>
-    	<dt>Generator:</dt>
+      <dl>
+        <dt>Generator:</dt>
         <dd><!-- GENERATOR --></dd>
         <dt>Images returned:</dt>
         <dd><!-- IMAGE_COUNT --></dd>
-        </dl>
+      </dl>
 '''
 
 RESULT_IN_FRAME_HTML = '''
-        <div class="result_img_container">
-            <!-- RESULT_IDX -->
-            <img class="result_img" src="<!-- RESULT_URL -->" alt="<!-- RESULT_TITLE -->" />
-        </div>
+      <div class="result_img_container">
+        <!-- RESULT_IDX -->
+        <img class="result_img" src="<!-- RESULT_URL -->" alt="<!-- RESULT_TITLE -->" />
+      </div>
 '''
 
 def gen_results_page(results, generator_name, output_filename, show_in_browser=True):
@@ -198,5 +191,3 @@ def combine_results_pages(results_arr, generator_name_arr, output_filename, show
     if show_in_browser:
         import webbrowser
         webbrowser.open('file:///' + os.path.abspath(output_filename))
-
-    

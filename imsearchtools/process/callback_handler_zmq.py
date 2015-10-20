@@ -92,7 +92,7 @@ class CallbackHandler(object):
             syncservice.send(msg) # send synchronization reply
             subscribers = subscribers + 1
         log.debug('%d workers initialized', worker_count)
-        
+
 
     def run_callback(self, *args, **kwargs):
         self.runner.run(*args, **kwargs)
@@ -131,7 +131,7 @@ class CallbackTaskRunner(object):
         # channel -> result_manager
         self.tcdec_sender = context.socket(zmq.PUB)
         self.tcdec_sender.bind(ZMQ_TASK_COUNT_DEC_CH)
-        
+
         if DEBUG_CB:
             self.launched_tasks = 0
 
@@ -158,7 +158,7 @@ class CallbackTaskRunner(object):
 class CallbackTaskWorkers(object):
     """Class used internally by CallbackHandler to launch a pool of workers"""
     def __init__(self, worker_func, worker_count):
-            
+
         self.workers = [None]*worker_count
         for wrk_num in range(worker_count):
             if PROC_TYPE == ProcType.gipc:
@@ -239,7 +239,6 @@ class CallbackTaskWorkers(object):
                     log.debug('Terminating worker number %d', wrk_num)
                     break
 
-    
 
 def result_manager(num_tasks):
     """Function used internally by CallbackHandler to collect results of tasks"""
@@ -285,4 +284,3 @@ def result_manager(num_tasks):
 
     # terminate all workers when all tasks completed
     control_sender.send(ZMQ_CONTROL_DONE)
-    

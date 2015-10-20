@@ -41,7 +41,6 @@ def downsize_by_max_dims(im, shape=(10000,10000)):
     else:
         return im
 
-
 def create_thumbnail(im, shape=(128,128), pad_to_size=True):
     resized = downsize_by_max_dims(im, shape)
     nw, nh = im.size

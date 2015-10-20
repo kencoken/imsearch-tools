@@ -43,7 +43,7 @@ def query():
         query_params['num_results'] = int(request.args['num_results'])
     # execute query
     query_res_list = http_service_helper.imsearch_query(query, engine, query_params)
-    
+
     return Response(json.dumps(query_res_list), mimetype='application/json')
 
 @app.route('/download', methods=['POST'])
@@ -56,7 +56,7 @@ def download():
     dfiles_list = http_service_helper.imsearch_download_to_static(query_res_list)
     # convert pathnames to URL paths
     url_dfiles_list = http_service_helper.make_url_dfiles_list(dfiles_list)
-    
+
     return Response(json.dumps(url_dfiles_list), mimetype='application/json')
 
 @app.route('/get_postproc_module_list')
@@ -141,4 +141,3 @@ if __name__ == '__main__':
     print "Starting imsearch_http_service on port", SERVER_PORT
     http_server = WSGIServer(('', SERVER_PORT), app)
     http_server.serve_forever()
-    

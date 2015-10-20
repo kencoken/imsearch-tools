@@ -46,7 +46,7 @@ class CallbackHandler(object):
     def run_callback(self, *args, **kwargs):
         # pop off keyword parameters from kwargs
         blocking = kwargs.pop('blocking', False)
-        
+
         #log.debug('Starting task for file: %s', out_dict['clean_fn'])
         if not self.worker_pool_closed:
             log.debug('Starting task')
@@ -108,11 +108,11 @@ class CallbackHandler(object):
             callback_greenlet = self.worker_pool.spawn(self._callback_func, worker_params)
             if blocking:
                 callback_greenlet.join()
-        
+
     def _callback_func(self, worker_params):
         self.worker_func(*worker_params['args'], **worker_params['kwargs'])
         self._dec_task_count_completed()
-        
+
     def _dec_task_count_completed(self):
         self.task_count = self.task_count - 1
         log.debug('Completed post-computation, remaining tasks: %d', self.task_count)
@@ -120,5 +120,3 @@ class CallbackHandler(object):
     def _dec_task_count_skipped(self):
         self.task_count = self.task_count - 1
         log.debug('Skipped post-computation, remaining tasks: %d', self.task_count)
-
-    

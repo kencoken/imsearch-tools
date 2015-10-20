@@ -24,7 +24,7 @@ class ImageProcessorSettings(object):
     """Settings class for ImageProcessor
 
     Defines the following setting groups:
-    
+
         filter - settings related to filtering out of images from further processing
         conversion - settings related to the standardization and re-writing of
             downloaded images
@@ -52,7 +52,7 @@ class ImageProcessorSettings(object):
                               height = 90,
                               pad_to_size = True)
 
-    
+
 class ImageProcessor(object):
     """Base class providing utility methods for cleaning up images downloaded
     from the web. Requires the subclass to define the following:
@@ -62,7 +62,7 @@ class ImageProcessor(object):
     """
 
     # Create filenames
-    
+
     def _filename_from_urldata(self, urldata):
         extension = os.path.splitext(urlparse.urlparse(urldata['url']).path)[1]
         fn = urldata['image_id'] + extension
@@ -96,7 +96,7 @@ class ImageProcessor(object):
         Returns:
             A tuple (clean_fn, thumb_fn) containing the filenames of the saved
             cleaned up image and thumbnail
-            
+
         """
         im = imutils.LazyImage(fn)
         self._filter_image(fn)

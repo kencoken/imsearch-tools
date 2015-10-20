@@ -25,7 +25,7 @@ class GoogleWebSearch(requests.Session, SearchClient):
 
     Created November 2013.
     """
-    
+
     def __init__(self, async_query=True, timeout=5.0, **kwargs):
         super(GoogleWebSearch, self).__init__()
 
@@ -52,7 +52,7 @@ class GoogleWebSearch(requests.Session, SearchClient):
         image_url_pattern = re.compile(r'imgurl=(.*?)&')
         #image_id_pattern = re.compile(r'id":"(.*?):')
         image_id_pattern = re.compile(r'name="(.*?):')
-            
+
         try:
             page_idx = int(math.floor(result_offset/float(self._results_per_req)))
             page_start = page_idx*self._results_per_req
@@ -93,7 +93,7 @@ class GoogleWebSearch(requests.Session, SearchClient):
             return resp_dict
         except requests.exceptions.RequestException:
             return []
-        
+
     def query(self, query, size='medium', style='photo', num_results=100):
         # prepare query parameters
         size = self._size_to_native_size(size)
@@ -114,7 +114,7 @@ class GoogleWebSearch(requests.Session, SearchClient):
         aux_params['ijn'] = 0      # causes AJAX request contents only to be returned
         if tbs_str:
             aux_params['tbs'] = tbs_str
-            
+
         headers = {'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.8; rv:25.0) Gecko/20100101 Firefox/25.0'}
 
         # do request
@@ -122,6 +122,5 @@ class GoogleWebSearch(requests.Session, SearchClient):
                                       num_results,
                                       aux_params=aux_params,
                                       headers=headers)
-        
+
         return results
-    

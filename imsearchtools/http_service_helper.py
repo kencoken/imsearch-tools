@@ -53,7 +53,7 @@ def imsearch_download_to_static(query_res_list, postproc_module=None,
             ig_params['opts'] = improc_settings
 
     imgetter = image_process.ImageGetter(**ig_params)
-        
+
     if not custom_local_path:
         outdir = os.path.join(os.getcwd(), 'static')
     else:

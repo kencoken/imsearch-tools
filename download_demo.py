@@ -33,4 +33,3 @@ if not os.path.isdir(outdir):
 #    if it is not required, the parameter can simply be removed
 output_fns = imgetter.process_urls(results, outdir, test_callback)
 print 'Downloaded %d results in %f seconds' % (len(output_fns), (time.time() - t))
-

@@ -32,7 +32,7 @@ class BingAPISearch(requests.Session, SearchClient):
 
         if not BING_API_KEY:
             raise NoAPICredentials('API Credentials must be specified in imsearch/engines/api_credentials.py')
-        
+
         self.auth = ('', BING_API_KEY)
         self.headers.update(kwargs)
         self.timeout = timeout
@@ -50,7 +50,7 @@ class BingAPISearch(requests.Session, SearchClient):
                                    num_results=-1):
         if num_results == -1:
             num_results = self._results_per_req
-            
+
         try:
             quoted_query = "'%s'" % query
 
@@ -70,7 +70,7 @@ class BingAPISearch(requests.Session, SearchClient):
             resp = self.get(BING_API_ENTRY + BING_API_FUNC, params=aux_params,
                             headers=headers)
             resp.raise_for_status()
-            
+
             # extract list of results from response
             result_dict = resp.json()
             if DEBUG_MESSAGES:
@@ -85,12 +85,12 @@ class BingAPISearch(requests.Session, SearchClient):
         return [{'url': item['MediaUrl'],
                  'image_id': md5(item['ID']).hexdigest(),
                  'title': item['Title']} for item in results]
-    
+
     def query(self, query, size='medium', style='photo', num_results=100):
         # prepare query parameters
         size = self._size_to_native_size(size)
         style = self._style_to_native_style(style)
-        
+
         image_filters_list = []
         if size:
             image_filters_list.append('Size:%s' % size)
@@ -115,4 +115,3 @@ class BingAPISearch(requests.Session, SearchClient):
                                       aux_params=aux_params)
 
         return self.__bing_results_to_results(results)
-    

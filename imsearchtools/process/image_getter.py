@@ -94,7 +94,7 @@ class ImageGetter(ImageProcessor):
                 self._callback_handler.skip()
 
             return None
-        
+
     def _download_image(self, url, output_fn):
         if imutils.image_exists(output_fn):
             log.info('Output filename exists for URL: %s', url)
@@ -106,7 +106,7 @@ class ImageGetter(ImageProcessor):
 
         with open(output_fn, 'w') as f:
             f.write(r.read())
-        
+
     def process_urls(self, urls, output_dir, completion_func=None,
                      completion_worker_count=-1, completion_extra_prms=None):
         """Process returned list of URL dicts returned from search client class
@@ -128,7 +128,7 @@ class ImageGetter(ImageProcessor):
                   'clean_fn':'/path/to/processed/and/validated/image',
                   'thumb_fn':'/path/to/thumbnail'},
                   ...]
-            
+
         """
 
         # check input parameters
@@ -183,5 +183,3 @@ class ImageGetter(ImageProcessor):
                 results.append(job.value)
 
         return results
-        
-
