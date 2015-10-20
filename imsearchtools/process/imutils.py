@@ -7,7 +7,6 @@ Author: Ken Chatfield <ken@robots.ox.ac.uk>
 Created on: 19 Oct 2012
 """
 
-import numpy as np
 from PIL import Image as PILImage
 import math
 
@@ -41,7 +40,7 @@ def downsize_by_max_dims(im, shape=(10000,10000)):
         return resized
     else:
         return im
-        
+
 
 def create_thumbnail(im, shape=(128,128), pad_to_size=True):
     resized = downsize_by_max_dims(im, shape)
@@ -60,7 +59,7 @@ class LazyImage(object):
     def __init__(self, filename):
         self.filename = filename
         self._image = None
-    
+
     @property
     def image(self):
         if self._image is None:

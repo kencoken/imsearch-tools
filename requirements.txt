@@ -1,7 +1,5 @@
 gevent>=1.0.1
 requests>=2.5.1
 pillow>=2.7.0
-numpy>=1.9.0
-scipy>=0.14.0
 flask>=0.10.1
 pyzmq>=14.3.1
