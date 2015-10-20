@@ -8,14 +8,14 @@ Authors:
 
 Copyright 2010-2015, all rights reserved.
 
-Release: v1.2.2 (April 2015)
+Release: v1.2.3 (October 2015)
 
 Installation Instructions
 -------------------------
 
 First install all Python dependencies using:
 
-    $ python install -r requirements.txt
+    $ pip install -r requirements.txt
 
 Following this:
 
@@ -239,6 +239,8 @@ example in `example_textlog_module.py` for the required format of the module fil
 Revision History
 ----------------
 
+ + *Oct 2015* (1.2.3)
+     - Cleaning up, demonstrate querying for variable number of images
  + *Apr 2015* (1.2.2)
      - Updated python dependencies and added server launch utilities
  + *Jun 2014* (1.2.1)

@@ -20,6 +20,8 @@ test_google_api = True
 test_google_web = True
 test_flickr_api = True
 
+num_results = 100
+
 display_results = True
 
 all_results = []
@@ -29,7 +31,8 @@ if test_bing_api:
     bing_api_searcher = image_query.BingAPISearch()
     print 'Executing Bing API Search...'
     t = time.time()
-    bing_api_results = bing_api_searcher.query(test_query_str)
+    bing_api_results = bing_api_searcher.query(test_query_str,
+                                               num_results=num_results)
     bing_api_timing = time.time() - t
     print 'Retrieved %d results in %f seconds' % (len(bing_api_results), bing_api_timing)
 
@@ -45,7 +48,8 @@ if test_google_old_api:
     google_old_api_searcher = image_query.GoogleOldAPISearch()
     print 'Executing Google API Search (Old)...'
     t = time.time()
-    google_old_api_results = google_old_api_searcher.query(test_query_str)
+    google_old_api_results = google_old_api_searcher.query(test_query_str,
+                                                           num_results=num_results)
     google_old_api_timing = time.time() - t
     print 'Retrieved %d results in %f seconds' % (len(google_old_api_results), google_old_api_timing)
 
@@ -61,7 +65,8 @@ if test_google_api:
     google_api_searcher = image_query.GoogleAPISearch()
     print 'Executing Google API Search (Custom Search)...'
     t = time.time()
-    google_api_results = google_api_searcher.query(test_query_str)
+    google_api_results = google_api_searcher.query(test_query_str,
+                                                   num_results=num_results)
     google_api_timing = time.time() - t
     print 'Retrieved %d results in %f seconds' % (len(google_api_results), google_api_timing)
 
@@ -77,7 +82,8 @@ if test_google_web:
     google_web_searcher = image_query.GoogleWebSearch()
     print 'Executing Google Web Search...'
     t = time.time()
-    google_web_results = google_web_searcher.query(test_query_str)
+    google_web_results = google_web_searcher.query(test_query_str,
+                                                   num_results=num_results)
     google_web_timing = time.time() - t
     print 'Retrieved %d results in %f seconds' % (len(google_web_results), google_web_timing)
 
@@ -94,7 +100,8 @@ if test_flickr_api:
     flickr_api_searcher = image_query.FlickrAPISearch()
     print 'Executing Flickr API Search...'
     t = time.time()
-    flickr_api_results = flickr_api_searcher.query(test_query_str)
+    flickr_api_results = flickr_api_searcher.query(test_query_str,
+                                                   num_results=num_results)
     flickr_api_timing = time.time() - t
     print 'Retrieved %d results in %f seconds' % (len(flickr_api_results), flickr_api_timing)
 
