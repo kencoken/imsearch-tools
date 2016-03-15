@@ -9,7 +9,7 @@ from api_credentials import *
 ## API Configuration
 #  --------------------------------------------
 
-FLICKR_API_ENTRY = 'http://api.flickr.com/services/rest/'
+FLICKR_API_ENTRY = 'https://api.flickr.com/services/rest/'
 FLICKR_API_METHOD = 'flickr.photos.search'
 
 ## Search Class
