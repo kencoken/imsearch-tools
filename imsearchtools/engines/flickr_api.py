@@ -9,7 +9,7 @@ from api_credentials import *
 ## API Configuration
 #  --------------------------------------------
 
-FLICKR_API_ENTRY = 'http://api.flickr.com/services/rest/'
+FLICKR_API_ENTRY = 'https://api.flickr.com/services/rest/'
 FLICKR_API_METHOD = 'flickr.photos.search'
 
 ## Search Class
@@ -23,7 +23,7 @@ class FlickrAPISearch(requests.Session, SearchClient):
     def __init__(self, async_query=True, timeout=5.0, **kwargs):
         super(FlickrAPISearch, self).__init__()
 
-        if not FLICKR_API_KEY or not FLICKR_API_SECRET:
+        if not FLICKR_API_KEY:
             raise NoAPICredentials('API Credentials must be specified in imsearch/engines/api_credentials.py')
 
         self.headers.update(kwargs)
