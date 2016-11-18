@@ -1,5 +1,5 @@
 if [ $# -lt 1 ]; then
-    SERVER_PORT=35200
+    SERVER_PORT=36218
 else
     if [ $# -ne 1 ]; then
         echo "Usage: `basename $0` [SERVER_PORT]"

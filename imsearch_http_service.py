@@ -9,7 +9,8 @@ from flask import json
 from imsearchtools import http_service_helper
 
 import logging
-logging.basicConfig(format='%(asctime)s %(levelname)s:%(message)s', level=logging.DEBUG)
+#logging.basicConfig(format='%(asctime)s %(levelname)s:%(message)s', level=logging.DEBUG)
+logging.basicConfig(format='%(asctime)s %(levelname)s:%(message)s', level=logging.INFO)
 
 DEFAULT_SERVER_PORT = 8157
 SUPPORTED_ENGINES = ['bing_api', 'google_old_api', 'google_api', 'google_web', 'flickr_api']

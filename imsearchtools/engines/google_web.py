@@ -43,16 +43,35 @@ class GoogleWebSearch(requests.Session, SearchClient):
                                       'face': 'face'}
         self.async_query = async_query
 
+    def _url_clean_up(self, url):
+        """ 
+        Some extracted urls can include search parameters after the image file name or can contain complicated encoded redirections.
+        This method does its best to clean up image url. After that it just assumes the url is correct and returns it.
+        """
+        if url!=None and url!="":
+            if '?' in url:
+                url = url.split('?')[0]
+            if '\\' in url:
+                url = url.split('\\')[0]
+            if '$' in url:
+                url = url.split('$')[0]
+            # add further filter her is necessary    
+        return url
+    
     def _fetch_results_from_offset(self, query, result_offset,
                                    aux_params={}, headers={},
                                    num_results=-1):
         #if num_results == -1:
         #    num_results = self._results_per_req
-        image_div_pattern = re.compile(r'<div class="rg_di(.*?)</div>')
-        image_url_pattern = re.compile(r'imgurl=(.*?)&')
-        #image_id_pattern = re.compile(r'id":"(.*?):')
-        image_id_pattern = re.compile(r'name="(.*?):')
-            
+        
+        #image_div_pattern = re.compile(r'<div class="rg_di(.*?)</div>') # previous version
+        #image_url_pattern = re.compile(r'imgurl=(.*?)&') # previous version        
+        #image_id_pattern = re.compile(r'id":"(.*?):') # previous-to-previous version ?
+        #image_id_pattern = re.compile(r'name="(.*?):') # previous version
+        
+        image_div_pattern = re.compile(r'<div class="rg_meta">(.*?)</div>')
+        image_url_pattern = re.compile(r'"ou":"(.*?)"')
+
         try:
             page_idx = int(math.floor(result_offset/float(self._results_per_req)))
             page_start = page_idx*self._results_per_req
@@ -71,10 +90,12 @@ class GoogleWebSearch(requests.Session, SearchClient):
             image_data = []
             for div in image_divs:
                 image_url_match = image_url_pattern.search(div)
-                image_id_match = image_id_pattern.search(div)
-                if image_url_match and image_id_match:
-                    image_data.append((image_url_match.group(1),
-                                       image_id_match.group(1)))
+                url = image_url_match.group(1)
+                url = self._url_clean_up(url)
+                #image_id_match = image_id_pattern.search(div) # html does not include a 'name' anymore, so extract it from the url
+                name = url.rsplit('/', 1)[-1]
+                if url and name:
+                    image_data.append((url, name))
 
             # modify returned results list according to input params
             # (if necessary)
