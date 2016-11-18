@@ -5,10 +5,11 @@ Authors:
 
  + Ken Chatfield, University of Oxford – <ken@robots.ox.ac.uk>
  + Kevin McGuinness, Dublin City University – <kevin.mcguinness@eeng.dcu.ie>
+ + Ernesto Coto - <ecoto@robots.ox.ac.uk>
 
-Copyright 2010-2014, all rights reserved.
+Copyright 2010-2016, all rights reserved.
 
-Release: v1.2.1 (June 2014)
+Last release: v1.2.1 (June 2014)
 
 Installation Instructions
 -------------------------
@@ -55,7 +56,7 @@ Currently the following search services are supported:
      - Details and authentication key available at:
        <https://developers.google.com/custom-search/v1/overview/>
  + **GoogleOldAPISearch ( )** – Image search using Google, using the *Google Image Search API*
-     - The *Google Image Search API* is now deprecated
+     - **The *Google Image Search API* is now deprecated**
      - A limit of 64 images per search is imposed
      - There is a higher default limit on number of free requests/day than with the
        new API
@@ -65,6 +66,7 @@ Currently the following search services are supported:
      - Details and authentication key available at:
        <http://www.bing.com/developers/>
  + **FlickrAPISearch ( )** – Image search using Flickr, using the *Flickr API*
+     - **The *Flickr API* is now deprecated**
      - Provides text search of Flickr photos by associated tags
      - Details and authentication key available at:
        <http://www.flickr.com/services/api/>
@@ -242,9 +244,19 @@ example in `example_textlog_module.py` for the required format of the module fil
 Revision History
 ----------------
 
+ + *Aug-Nov 2016*
+     - EC taking over responsability to fix this code
+     - Fixed google web engine to work with updated Google search page
+     - Fixed test for google web engine
+     - Fixes on supported styles map
+     - Replaced exceptions with warnings when an unsupported size/style is specified,
+       allowing the default values to be used instead
+     - Improved logging of the postprocessing modules
+     - Improved some comments and readmes
+     - Replaced invalid, old, API credentials
  + *Jun 2014* (1.2.1)
      - Switched from `requests` library for downloader to monkey-patched `urllib2`
-	   to make gevent greenlets work properly
+       to make gevent greenlets work properly
  + *May 2014* (1.2)
      - Fixed `google-web` engine to work with updated Google search page
  + *Feb 2013*
@@ -262,4 +274,3 @@ Revision History
      - Updated Google web search method due to updates
  + *Nov 2010*
      - Original version with support for Google Image Search API + scraping
- 

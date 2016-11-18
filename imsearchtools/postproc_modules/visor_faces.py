@@ -18,7 +18,7 @@ def callback_func(out_dict, extra_prms=None):
     try:
         sock.connect((extra_prms['backend_host'], extra_prms['backend_port']))
     except error, msg:
-        print 'Connect failed', msg
+        print 'VISOR FACES: Connect failed', msg
         raise error
 
     sock.settimeout(TCP_TIMEOUT)
@@ -37,7 +37,7 @@ def callback_func(out_dict, extra_prms=None):
 		   extra_params=dict())
     request = json.dumps(func_in)
     
-    print 'Request to VISOR backend: ' + request
+    print 'VISOR FACES: Request to VISOR backend: ' + request
     
     request = request + TCP_TERMINATOR
 
@@ -53,7 +53,7 @@ def callback_func(out_dict, extra_prms=None):
                 if response[-len(TCP_TERMINATOR):] == TCP_TERMINATOR:
                     break
         except timeout:
-            print 'Socket timeout'
+            print 'VISOR FACES: Socket timeout'
             sock.close()
 
     #response = ""

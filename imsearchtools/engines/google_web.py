@@ -19,6 +19,7 @@ GOOGLE_WEB_FUNC = 'search'
 
 class GoogleWebSearch(requests.Session, SearchClient):
     """Wrapper class for Google Image Search using web interface.
+    See https://www.google.com/advanced_image_search
 
     This class does not use any API, but instead extracts results directly from the
     web search pages (acting as Firefox v25.0).
@@ -37,10 +38,10 @@ class GoogleWebSearch(requests.Session, SearchClient):
                                      'medium': 'm',
                                      'large': 'l'}
         self._supported_styles_map = {'photo': 'photo',
-                                      'graphics': 'clipart',
                                       'clipart': 'clipart',
                                       'lineart': 'lineart',
-                                      'face': 'face'}
+                                      'face': 'face',
+                                      'animated': 'animated'}
         self.async_query = async_query
 
     def _url_clean_up(self, url):
