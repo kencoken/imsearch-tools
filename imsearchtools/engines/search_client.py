@@ -48,7 +48,9 @@ class SearchClient(object):
         if size == '':
             return size
         if size not in self._supported_sizes_map:
-            raise ValueError("Unsupported size '%s'" % size)
+            # do not completely abort because of this
+            print "**** WARNING: Unsupported size '%s'. Ignoring value. ****" % size
+            return ''
         else:
             return self._supported_sizes_map[size]
 
@@ -56,7 +58,9 @@ class SearchClient(object):
         if style == '':
             return style
         if style not in self._supported_styles_map:
-            raise ValueError("Unsupported style '%s'" % style)
+            # do not completely abort because of this
+            print "**** WARNING: Unsupported style '%s'. Ignoring value. ****" % style
+            return ''
         else:
             return self._supported_styles_map[style]
     
