@@ -9,7 +9,9 @@ Authors:
 
 Copyright 2010-2016, all rights reserved.
 
-Last release: v1.2.1 (June 2014)
+Last release: v1.2.1 (June 2014). See the original repository of the Image Search Tool at <https://github.com/kencoken/imsearch-tools>.
+
+This is a NEW repository introducing new changes.
 
 Installation Instructions
 -------------------------
