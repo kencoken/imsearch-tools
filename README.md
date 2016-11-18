@@ -56,21 +56,20 @@ Currently the following search services are supported:
      - Details and authentication key available at:
        <https://developers.google.com/custom-search/v1/overview/>
  + **GoogleOldAPISearch ( )** – Image search using Google, using the *Google Image Search API*
-     - The *Google Image Search API* is now deprecated
+     - **The *Google Image Search API* is now deprecated**
      - A limit of 64 images per search is imposed
      - There is a higher default limit on number of free requests/day than with the
        new API
      - Details and authentication key available at:
        <https://developers.google.com/image-search/>
-     - **UPDATE 2016: This search is not working because the API has been fully deprecated !.
  + **BingAPISearch ( )** – Image search using Bing, using the *Bing Search API*
      - Details and authentication key available at:
        <http://www.bing.com/developers/>
  + **FlickrAPISearch ( )** – Image search using Flickr, using the *Flickr API*
+     - **The *Flickr API* is now deprecated**
      - Provides text search of Flickr photos by associated tags
      - Details and authentication key available at:
        <http://www.flickr.com/services/api/>
-     - **UPDATE 2016: This search is not working because the API has been fully deprecated !.
        
 A test script `query_test.py` is provided which can be used to visualize the difference
 between the methods:
