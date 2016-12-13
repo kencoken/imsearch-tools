@@ -15,6 +15,7 @@ if not os.path.isdir(outdir):
     os.makedirs(outdir)
 
 test_bing_api_v1 = True
+test_bing_api_v5 = True
 test_google_old_api = True
 test_google_api = True
 test_google_web = True
@@ -40,6 +41,22 @@ if test_bing_api_v1:
 
     all_results.append(bing_api_results)
     all_generator_names.append('BingAPISearchV1()')
+
+if test_bing_api_v5:
+    bing_api_searcher = image_query.BingAPISearchV5()
+    print 'Executing Bing API Search V5...'
+    t = time.time()
+    bing_api_results = bing_api_searcher.query(test_query_str)
+    bing_api_timing = time.time() - t
+    print 'Retrieved %d results in %f seconds' % (len(bing_api_results), bing_api_timing)
+
+    result_page_gen.gen_results_page(bing_api_results,
+                                       'BingAPISearchV5()',
+                                       os.path.join(outdir, 'bing_api_v5_results.html'),
+                                       show_in_browser=False)
+
+    all_results.append(bing_api_results)
+    all_generator_names.append('BingAPISearchV5()')
 
 if test_google_old_api:
     google_old_api_searcher = image_query.GoogleOldAPISearch()
