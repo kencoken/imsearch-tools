@@ -21,7 +21,7 @@ Ernesto Coto
 
 # Obtain at:
 # https://datamarket.azure.com/dataset/5BA839F1-12CE-4CCE-BF57-A49D98D29A44
-BING_API_KEY = ''
+BING_API_KEY_V1 = ''
 
 # Obtain at:
 # https://developers.google.com/image-search/
