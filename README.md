@@ -71,6 +71,7 @@ Currently the following search services are supported:
  + **BingAPISearchV5 ( )** – Image search using Bing, using the *Bing Search API V5*
      - Authentication key available at: <https://www.microsoft.com/cognitive-services/en-us/subscriptions>
      - Image Search API Reference at: <https://msdn.microsoft.com/en-us/library/dn760791(v=bsynd.50).aspx>
+     - API Testing Console at: <https://dev.cognitive.microsoft.com/docs/services/56b43f0ccf5ff8098cef3808/operations/571fab09dbe2d933e891028f>
  + **FlickrAPISearch ( )** – Image search using Flickr, using the *Flickr API*
      - **The *Flickr API* is now deprecated**
      - Provides text search of Flickr photos by associated tags
