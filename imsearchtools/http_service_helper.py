@@ -16,7 +16,7 @@ def imsearch_query(query, engine, query_params, query_timeout=-1.0):
         searcher_args['timeout'] = query_timeout
     # initialize searcher
     if engine == 'bing_api':
-        searcher = image_query.BingAPISearch(**searcher_args)
+        searcher = image_query.BingAPISearchV5(**searcher_args)
     elif engine == 'google_old_api':
         searcher = image_query.GoogleOldAPISearch(**searcher_args)
     elif engine == 'google_api':
