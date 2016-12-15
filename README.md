@@ -9,7 +9,9 @@ Authors:
 
 Copyright 2010-2016, all rights reserved.
 
-Last release: v1.2.1 (June 2014)
+Last release: v1.2.1 (June 2014). See the original repository of the Image Search Tool at <https://github.com/kencoken/imsearch-tools>.
+
+This is a NEW repository introducing new changes.
 
 Installation Instructions
 -------------------------
@@ -62,9 +64,14 @@ Currently the following search services are supported:
        new API
      - Details and authentication key available at:
        <https://developers.google.com/image-search/>
- + **BingAPISearch ( )** – Image search using Bing, using the *Bing Search API*
+ + **BingAPISearchV1 ( )** – Image search using Bing, using the *Bing Search API V1*
+     - **The *Bing Search API V1* is now deprecated**
      - Details and authentication key available at:
        <http://www.bing.com/developers/>
+ + **BingAPISearchV5 ( )** – Image search using Bing, using the *Bing Search API V5*
+     - Authentication key available at: <https://www.microsoft.com/cognitive-services/en-us/subscriptions>
+     - Image Search API Reference at: <https://msdn.microsoft.com/en-us/library/dn760791(v=bsynd.50).aspx>
+     - API Testing Console at: <https://dev.cognitive.microsoft.com/docs/services/56b43f0ccf5ff8098cef3808/operations/571fab09dbe2d933e891028f>
  + **FlickrAPISearch ( )** – Image search using Flickr, using the *Flickr API*
      - **The *Flickr API* is now deprecated**
      - Provides text search of Flickr photos by associated tags
@@ -244,6 +251,9 @@ example in `example_textlog_module.py` for the required format of the module fil
 Revision History
 ----------------
 
+ + *Dec 2016*
+     - Added a new engine for the new BING API (v5)
+     - Deprecated the previous version of the BING API (v1)
  + *Aug-Nov 2016*
      - EC taking over responsability to fix this code
      - Fixed google web engine to work with updated Google search page
