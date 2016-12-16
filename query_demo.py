@@ -14,9 +14,9 @@ outdir = os.path.join(os.getcwd(), 'demos')
 if not os.path.isdir(outdir):
     os.makedirs(outdir)
 
-test_bing_api_v1 = True
+test_bing_api_v1 = False    # deprecated, to be removed later
 test_bing_api_v5 = True
-test_google_old_api = True
+test_google_old_api = False # deprecated, to be removed later
 test_google_api = True
 test_google_web = True
 test_flickr_api = True
