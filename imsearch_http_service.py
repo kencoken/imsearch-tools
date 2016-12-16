@@ -13,7 +13,7 @@ import logging
 logging.basicConfig(format='%(asctime)s %(levelname)s:%(message)s', level=logging.INFO)
 
 DEFAULT_SERVER_PORT = 8157
-SUPPORTED_ENGINES = ['bing_api', 'google_old_api', 'google_api', 'google_web', 'flickr_api']
+SUPPORTED_ENGINES = ['bing_api', 'google_api', 'google_web', 'flickr_api']
 
 zmq_context = None # used to store zmq context created by init_zmq_context function
 
