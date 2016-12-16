@@ -87,7 +87,7 @@ class FlickrAPISearch(requests.Session, SearchClient):
                  'image_id': md5(item['id']).hexdigest(),
                  'title': item['title']} for item in results]
 
-    def query(self, query, size='medium', num_results=100):
+    def query(self, query, size='medium', style='photo', num_results=100):
         # prepare query parameters
         size = self._size_to_native_size(size)
         
@@ -97,7 +97,7 @@ class FlickrAPISearch(requests.Session, SearchClient):
                       'format': 'json',
                       'nojsoncallback': 1,
                       'sort': 'relevance',
-                      'content_type': 1} # just photos
+                      'content_type': 1} # just photos, 'style' parameter would be ignored
 
         # do request
         results = self._fetch_results(query,
