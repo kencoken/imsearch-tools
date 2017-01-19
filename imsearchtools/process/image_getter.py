@@ -48,12 +48,16 @@ class ImageGetter(ImageProcessor):
         self.subprocs = []
 
     def process_url(self, urldata, output_dir, call_completion_func=False,
-                    completion_extra_prms=None, start_time=0):
+                    completion_extra_prms=None, start_time=0, process_images=True):
         error_occurred = False
         try:
             output_fn = os.path.join(output_dir, self._filename_from_urldata(urldata))
             self._download_image(urldata['url'], output_fn)
-            clean_fn, thumb_fn = self.process_image(output_fn)
+            if process_images:
+                clean_fn, thumb_fn = self.process_image(output_fn)
+            else:
+                clean_fn = None
+                thumb_fn = None
         except urllib2.URLError, e:
             log.info('URL Error for %s (%s)', urldata['url'], str(e))
             error_occurred = True
@@ -108,7 +112,7 @@ class ImageGetter(ImageProcessor):
             f.write(r.read())
         
     def process_urls(self, urls, output_dir, completion_func=None,
-                     completion_worker_count=-1, completion_extra_prms=None):
+                     completion_worker_count=-1, completion_extra_prms=None, process_images=True):
         """Process returned list of URL dicts returned from search client class
 
         Args:
@@ -146,7 +150,7 @@ class ImageGetter(ImageProcessor):
         jobs = [gevent.spawn(self.process_url,
                              urldata, output_dir,
                              call_completion_func=(completion_func is not None),
-                             completion_extra_prms=completion_extra_prms,
+                             completion_extra_prms=completion_extra_prms,process_images=process_images,
                              start_time=time.time())
                 for urldata in urls]
 
