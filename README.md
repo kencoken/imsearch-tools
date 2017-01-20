@@ -73,7 +73,6 @@ Currently the following search services are supported:
      - Image Search API Reference at: <https://msdn.microsoft.com/en-us/library/dn760791(v=bsynd.50).aspx>
      - API Testing Console at: <https://dev.cognitive.microsoft.com/docs/services/56b43f0ccf5ff8098cef3808/operations/571fab09dbe2d933e891028f>
  + **FlickrAPISearch ( )** – Image search using Flickr, using the *Flickr API*
-     - **The *Flickr API* is now deprecated**
      - Provides text search of Flickr photos by associated tags
      - Details and authentication key available at:
        <http://www.flickr.com/services/api/>
@@ -252,6 +251,8 @@ Revision History
 ----------------
 
  + *Dec 2016*
+     - Other minor modifications.
+     - Updated the Flickr API access point and query style. This engine is back to work.
      - Added a new engine for the new BING API (v5)
      - Deprecated the previous version of the BING API (v1)
  + *Aug-Nov 2016*
