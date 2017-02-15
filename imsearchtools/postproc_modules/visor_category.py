@@ -41,13 +41,16 @@ def callback_func(out_dict, extra_prms=None):
     (featfn, imext) = os.path.splitext(imfn)
     featfn += '.bin'
     featpath = os.path.join(extra_prms['featdir'], featfn)
+    extra_params=dict()
+    if 'detector' in extra_prms:
+        extra_params['detector'] = extra_prms['detector']
     # construct VISOR backend function call
     func_in = dict(func=extra_prms['func'],
                    query_id=extra_prms['query_id'],
                    impath=out_dict['clean_fn'],
                    featpath=featpath,
                    from_dataset=0,
-                   extra_params=dict())
+                   extra_params=extra_params)
     request = json.dumps(func_in)
 
     log.info('VISOR CATEGORY: Prepared request to VISOR backend (%s): %s', debug_cb_id, request)

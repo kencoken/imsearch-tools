@@ -13,6 +13,7 @@ SUCCESS_FIELD = "success"
 TCP_TIMEOUT = 86400.00
 
 def callback_func(out_dict, extra_prms=None):
+
     # connect to VISOR backend service
     sock = socket(AF_INET, SOCK_STREAM)
     try:
@@ -23,18 +24,22 @@ def callback_func(out_dict, extra_prms=None):
 
     sock.settimeout(TCP_TIMEOUT)
 
+
     # generate feature file path from image file path
     imfn = os.path.basename(out_dict['clean_fn'])
     (featfn, imext) = os.path.splitext(imfn)
     featfn += '.bin'
     featpath = os.path.join(extra_prms['featdir'], featfn)
+    extra_params=dict()
+    if 'detector' in extra_prms:
+        extra_params['detector'] = extra_prms['detector']
     # construct VISOR backend function call
-    func_in = dict(func=extra_prms['func'],
-                   query_id=extra_prms['query_id'],
-                   impath=out_dict['clean_fn'],
-                   featpath=featpath,
-                   from_dataset=0,
-		   extra_params=dict())
+    func_in = dict( func=extra_prms['func'],
+                    query_id=extra_prms['query_id'],
+                    impath=out_dict['clean_fn'],
+                    featpath=featpath,
+                    from_dataset=0,
+                    extra_params=extra_params)
     request = json.dumps(func_in)
     
     print 'VISOR FACES: Request to VISOR backend: ' + request
