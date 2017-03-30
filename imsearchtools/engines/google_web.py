@@ -6,9 +6,8 @@ import math
 from hashlib import md5
 
 from search_client import *
-from api_credentials import *
 
-## API Configuration
+## Engine Configuration
 #  --------------------------------------------
 
 GOOGLE_WEB_ENTRY = 'http://www.google.com/'
