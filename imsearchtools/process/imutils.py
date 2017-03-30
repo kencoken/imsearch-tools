@@ -7,7 +7,6 @@ Author: Ken Chatfield <ken@robots.ox.ac.uk>
 Created on: 19 Oct 2012
 """
 
-import numpy as np
 from PIL import Image as PILImage
 import math
 
