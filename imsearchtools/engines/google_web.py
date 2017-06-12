@@ -69,7 +69,7 @@ class GoogleWebSearch(requests.Session, SearchClient):
         #image_id_pattern = re.compile(r'id":"(.*?):') # previous-to-previous version ?
         #image_id_pattern = re.compile(r'name="(.*?):') # previous version
         
-        image_div_pattern = re.compile(r'<div class="rg_meta">(.*?)</div>')
+        image_div_pattern = re.compile(r'<div class="rg_meta(.*?)</div>')
         image_url_pattern = re.compile(r'"ou":"(.*?)"')
 
         try:
