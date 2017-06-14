@@ -44,7 +44,7 @@ class ImageGetter(ImageProcessor):
         self.opts = opts
         self.timeout = timeout
         self.image_timeout = image_timeout
-        self.headers = {'User-Agent': 'Mozilla/5.0'}
+        self.headers = {'User-Agent': 'Mozilla/5.0 Gecko/20071127 Firefox/2.0.0.11'}
         self.subprocs = []
 
     def process_url(self, urldata, output_dir, call_completion_func=False,

@@ -1,1 +1,0 @@
-import result_page_gen

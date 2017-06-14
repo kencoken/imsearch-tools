@@ -13,7 +13,6 @@ import logging
 logging.basicConfig(format='%(asctime)s %(levelname)s:%(message)s', level=logging.INFO)
 
 DEFAULT_SERVER_PORT = 8157
-SUPPORTED_ENGINES = ['bing_api', 'google_api', 'google_web', 'flickr_api']
 
 zmq_context = None # used to store zmq context created by init_zmq_context function
 
@@ -34,7 +33,6 @@ def callback_test():
 def query():
     # parse GET args
     query = request.args['q']
-    engine = request.args.get('engine', 'google_web')
 
     query_params = dict()
     for param_nm in ['size', 'style']:
@@ -42,9 +40,9 @@ def query():
             query_params[param_nm] = request.args[param_nm]
     if 'num_results' in request.args:
         query_params['num_results'] = int(request.args['num_results'])
+
     # execute query
-    query_res_list = http_service_helper.imsearch_query(query, engine, query_params)
-    
+    query_res_list = http_service_helper.imsearch_query(query, query_params)
     return Response(json.dumps(query_res_list), mimetype='application/json')
 
 @app.route('/download', methods=['POST'])
@@ -64,10 +62,6 @@ def download():
 def get_postproc_module_list():
     return json.dumps(http_service_helper.get_postproc_modules())
 
-@app.route('/get_engine_list')
-def get_engine_list():
-    return json.dumps(SUPPORTED_ENGINES)
-
 @app.route('/init_zmq_context')
 def init_zmq_context():
     global zmq_context
@@ -80,7 +74,6 @@ def init_zmq_context():
 def exec_pipeline():
     # parse POST form args
     query = request.form['q']
-    engine = request.form.get('engine', 'google_web')
     postproc_module = request.form.get('postproc_module', None) # default to no postproc module
     postproc_extra_prms = request.form.get('postproc_extra_prms', None)
     if postproc_extra_prms:
@@ -100,8 +93,7 @@ def exec_pipeline():
     if 'num_results' in request.form:
         query_params['num_results'] = int(request.form['num_results'])
     # execute query
-    query_res_list = http_service_helper.imsearch_query(query, engine,
-                                                        query_params, query_timeout)
+    query_res_list = http_service_helper.imsearch_query(query, query_params, query_timeout)
     print 'Query for %s completed: %d results retrieved' % (query, len(query_res_list))
     #query_res_list = query_res_list[:5] # DEBUG CODE
     # prepare download params

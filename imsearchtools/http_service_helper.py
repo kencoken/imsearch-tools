@@ -9,22 +9,14 @@ from imsearchtools import process as image_process
 from imsearchtools import postproc_modules
 
 
-def imsearch_query(query, engine, query_params, query_timeout=-1.0):
+def imsearch_query(query, query_params, query_timeout=-1.0, engine='google_web'):
     # prepare input arguments for searcher initialization if non-default
     searcher_args = dict()
     if query_timeout > 0.0:
         searcher_args['timeout'] = query_timeout
     # initialize searcher
-    if engine == 'bing_api':
-        searcher = image_query.BingAPISearchV5(**searcher_args)
-    elif engine == 'google_old_api':
-        searcher = image_query.GoogleOldAPISearch(**searcher_args)
-    elif engine == 'google_api':
-        searcher = image_query.GoogleAPISearch(**searcher_args)
-    elif engine == 'google_web':
+    if engine == 'google_web':
         searcher = image_query.GoogleWebSearch(**searcher_args)
-    elif engine == 'flickr_api':
-        searcher = image_query.FlickrAPISearch(**searcher_args)
     else:
         raise ValueError('Unkown query engine')
     # execute the query
