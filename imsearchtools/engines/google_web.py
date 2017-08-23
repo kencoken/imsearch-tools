@@ -62,7 +62,7 @@ class GoogleWebSearch(requests.Session, SearchClient):
                                    aux_params={}, headers={},
                                    num_results=-1):
 
-        image_div_pattern = re.compile(r'<div class="rg_meta(.*?)</div>')
+        image_div_pattern = re.compile(r'class="rg_meta(.*?)</div>')
         image_url_pattern = re.compile(r'"ou":"(.*?)"')
 
         try:
