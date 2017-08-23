@@ -28,7 +28,7 @@ class TestGoogleWeb(object):
         resp = requests.get(url, params=aux_params, headers=headers)
         resp_str = resp.text
 
-        image_div_pattern = re.compile(r'<div class="rg_meta(.*?)</div>')
+        image_div_pattern = re.compile(r'class="rg_meta(.*?)</div>')
         image_url_pattern = re.compile(r'"ou":"(.*?)"')
 
         image_divs = image_div_pattern.findall(resp_str)
@@ -38,13 +38,11 @@ class TestGoogleWeb(object):
 
         # test1: the GET and the QUERY return the same number of results
         res = self._gws.query(self._q,
-                              size='', style='',
                               num_results=len(image_urls))
         assert len(res) == len(image_urls)
 
         # test2: two consecutive QUERYS return the same number of results
         res2 = self._gws.query(self._q,
-                              size='', style='',
                               num_results=len(image_urls))
         assert len(res) == len(res2)
 

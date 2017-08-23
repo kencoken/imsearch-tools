@@ -63,13 +63,8 @@ class GoogleWebSearch(requests.Session, SearchClient):
                                    num_results=-1):
         #if num_results == -1:
         #    num_results = self._results_per_req
-        
-        #image_div_pattern = re.compile(r'<div class="rg_di(.*?)</div>') # previous version
-        #image_url_pattern = re.compile(r'imgurl=(.*?)&') # previous version        
-        #image_id_pattern = re.compile(r'id":"(.*?):') # previous-to-previous version ?
-        #image_id_pattern = re.compile(r'name="(.*?):') # previous version
-        
-        image_div_pattern = re.compile(r'<div class="rg_meta(.*?)</div>')
+
+        image_div_pattern = re.compile(r'class="rg_meta(.*?)</div>')
         image_url_pattern = re.compile(r'"ou":"(.*?)"')
 
         try:
@@ -80,7 +75,6 @@ class GoogleWebSearch(requests.Session, SearchClient):
             # add query position to auxilary parameters
             aux_params['q'] = query
             aux_params['ijn'] = page_idx  # ijn is the AJAX page index (0 = first page)
-            #aux_params['start'] = page_idx*self._results_per_req # apparently not necessary
 
             resp = self.get(GOOGLE_WEB_ENTRY + GOOGLE_WEB_FUNC,
                             params=aux_params, headers=headers)
@@ -92,7 +86,6 @@ class GoogleWebSearch(requests.Session, SearchClient):
                 image_url_match = image_url_pattern.search(div)
                 url = image_url_match.group(1)
                 url = self._url_clean_up(url)
-                #image_id_match = image_id_pattern.search(div) # html does not include a 'name' anymore, so extract it from the url
                 name = url.rsplit('/', 1)[-1]
                 if url and name:
                     image_data.append((url, name))
