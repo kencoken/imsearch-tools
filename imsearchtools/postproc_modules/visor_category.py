@@ -20,19 +20,10 @@ def callback_func(out_dict, extra_prms=None):
 
     debug_cb_id = random.getrandbits(128)
     debug_cb_id = '%032x' % debug_cb_id
-    
+
     log.debug('VISOR CATEGORY: Connecting to backend (%s)...', debug_cb_id)
     sock.connect((extra_prms['backend_host'], extra_prms['backend_port']))
     log.debug('VISOR CATEGORY: Connected to backend (%s)', debug_cb_id)
-
-    # connect_attempts = 0
-    # while connect_attempts < 10:
-    #     try:
-    #         sock.connect((extra_prms['backend_host'], extra_prms['backend_port']))
-    #         connect_attempts = 100
-    #     except:
-    #         connect_attempts = connect_attempts + 1
-    #         sleep(0.001)
 
     sock.settimeout(TCP_TIMEOUT)
 
