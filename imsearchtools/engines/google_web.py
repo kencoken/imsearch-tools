@@ -71,7 +71,7 @@ class GoogleWebSearch(requests.Session, SearchClient):
             page_offset = result_offset - page_start
 
             # add query position to auxilary parameters
-            aux_params['q'] = query
+            aux_params['as_q'] = query
             aux_params['ijn'] = page_idx  # ijn is the AJAX page index (0 = first page)
 
             resp = self.get(GOOGLE_WEB_ENTRY + GOOGLE_WEB_FUNC,
@@ -112,22 +112,17 @@ class GoogleWebSearch(requests.Session, SearchClient):
         style = self._style_to_native_style(style)
 
         # prepare auxilary parameters (contained in tbs)
-        tbs_list = []
+        aux_params = {}
         if size:
-            tbs_list.append('isz:%s' % size)
+            aux_params['imgsz'] = size
         if style:
-            tbs_list.append('itp:%s' % style)
-
-        tbs_str = ','.join(tbs_list)
+            aux_params['imgtype'] = style
 
         # prepare shared parameters
-        aux_params = {}
         aux_params['tbm'] = 'isch' #image search mode
         aux_params['ijn'] = 0      # causes AJAX request contents only to be returned
-        if tbs_str:
-            aux_params['tbs'] = tbs_str
             
-        headers = {'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.8; rv:25.0) Gecko/20100101 Firefox/25.0'}
+        headers = {'User-Agent': 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:58.0) Gecko/20100101 Firefox/58.0'}
 
         # do request
         results = self._fetch_results(query,
