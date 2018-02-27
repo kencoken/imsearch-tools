@@ -11,10 +11,10 @@ import gevent
 from gevent.timeout import Timeout
 
 from gevent import monkey; monkey.patch_socket()
-import urllib2
 from httplib import BadStatusLine
 
-#import requests
+import requests
+import shutil
 import os
 import urlparse
 import time
@@ -44,7 +44,6 @@ class ImageGetter(ImageProcessor):
         self.opts = opts
         self.timeout = timeout
         self.image_timeout = image_timeout
-        self.headers = {'User-Agent': 'Mozilla/5.0 Gecko/20071127 Firefox/2.0.0.11'}
         self.subprocs = []
 
     def process_url(self, urldata, output_dir, call_completion_func=False,
@@ -58,10 +57,10 @@ class ImageGetter(ImageProcessor):
             else:
                 clean_fn = None
                 thumb_fn = None
-        except urllib2.URLError, e:
-            log.info('URL Error for %s (%s)', urldata['url'], str(e))
+        except requests.ConnectionError, e:
+            log.info('Connection Error for %s (%s)', urldata['url'], str(e))
             error_occurred = True
-        except urllib2.HTTPError, e:
+        except requests.HTTPError, e:
             if e.code != 201:
                 log.info('HTTP Error for %s (%s)', urldata['url'], str(e))
                 error_occurred = True
@@ -98,19 +97,18 @@ class ImageGetter(ImageProcessor):
                 self._callback_handler.skip()
 
             return None
-        
+
     def _download_image(self, url, output_fn):
         if imutils.image_exists(output_fn):
             log.info('Output filename exists for URL: %s', url)
             return
 
         log.info('Downloading URL: %s', url)
-        request = urllib2.Request(url, headers=self.headers)
-        r = urllib2.urlopen(request, timeout=self.image_timeout)
+        response = requests.get(url, timeout=self.image_timeout, stream=True)
+        with open(output_fn, 'wb') as out_file:
+            shutil.copyfileobj(response.raw, out_file)
 
-        with open(output_fn, 'w') as f:
-            f.write(r.read())
-        
+
     def process_urls(self, urls, output_dir, completion_func=None,
                      completion_worker_count=-1, completion_extra_prms=None, process_images=True):
         """Process returned list of URL dicts returned from search client class
