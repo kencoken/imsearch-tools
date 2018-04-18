@@ -7,22 +7,20 @@ Author: Ken Chatfield <ken@robots.ox.ac.uk>
 Created on: 19 Oct 2012
 """
 
-import gevent
-from gevent.timeout import Timeout
-
-from gevent import monkey; monkey.patch_socket()
-from httplib import BadStatusLine
-
-import requests
 import shutil
 import os
-import urlparse
 import time
+import logging
+from httplib import BadStatusLine
+import requests
+
+import gevent
+from gevent.timeout import Timeout
+from gevent import monkey
+monkey.patch_socket()
 
 from image_processor import *
 import imutils
-
-import logging
 
 from callback_handler import CallbackHandler
 
@@ -104,9 +102,15 @@ class ImageGetter(ImageProcessor):
             return
 
         log.info('Downloading URL: %s', url)
-        response = requests.get(url, timeout=self.image_timeout, stream=True)
-        with open(output_fn, 'wb') as out_file:
-            shutil.copyfileobj(response.raw, out_file)
+        response = None
+        try:
+            response = requests.get(url, timeout=self.image_timeout, stream=True)
+        except Exception as e:
+            log.info('Exception while downloading from %s: %s' % (url, str(e)))
+            response = None
+        if response:
+            with open(output_fn, 'wb') as out_file:
+                shutil.copyfileobj(response.raw, out_file)
 
 
     def process_urls(self, urls, output_dir, completion_func=None,
@@ -130,7 +134,7 @@ class ImageGetter(ImageProcessor):
                   'clean_fn':'/path/to/processed/and/validated/image',
                   'thumb_fn':'/path/to/thumbnail'},
                   ...]
-            
+
         """
 
         # check input parameters
@@ -148,7 +152,7 @@ class ImageGetter(ImageProcessor):
         jobs = [gevent.spawn(self.process_url,
                              urldata, output_dir,
                              call_completion_func=(completion_func is not None),
-                             completion_extra_prms=completion_extra_prms,process_images=process_images,
+                             completion_extra_prms=completion_extra_prms, process_images=process_images,
                              start_time=time.time())
                 for urldata in urls]
 
@@ -164,7 +168,7 @@ class ImageGetter(ImageProcessor):
             for job in jobs:
                 try:
                     job.get(block=False)
-                except Timeout, IndexError:
+                except (Timeout, IndexError):
                     job.kill(block=True)
                     timeout_occurred = True
 
@@ -185,5 +189,3 @@ class ImageGetter(ImageProcessor):
                 results.append(job.value)
 
         return results
-        
-
