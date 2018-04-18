@@ -1,16 +1,14 @@
 #!/usr/bin/env python
 
 import sys
-
-from flask import Flask, request, Response, url_for
-from gevent.wsgi import WSGIServer
-from flask import json
-
-from imsearchtools import http_service_helper
-
 import logging
 #logging.basicConfig(format='%(asctime)s %(levelname)s:%(message)s', level=logging.DEBUG)
 logging.basicConfig(format='%(asctime)s %(levelname)s:%(message)s', level=logging.INFO)
+
+from flask import Flask, request, Response
+from flask import json
+from gevent.wsgi import WSGIServer
+from imsearchtools import http_service_helper
 
 DEFAULT_SERVER_PORT = 8157
 
@@ -32,7 +30,7 @@ def callback_test():
 @app.route('/query')
 def query():
     # parse GET args
-    query = request.args['q']
+    query_text = request.args['q']
 
     query_params = dict()
     for param_nm in ['size', 'style']:
@@ -42,7 +40,7 @@ def query():
         query_params['num_results'] = int(request.args['num_results'])
 
     # execute query
-    query_res_list = http_service_helper.imsearch_query(query, query_params)
+    query_res_list = http_service_helper.imsearch_query(query_text, query_params)
     return Response(json.dumps(query_res_list), mimetype='application/json')
 
 @app.route('/download', methods=['POST'])
@@ -73,14 +71,14 @@ def init_zmq_context():
 @app.route('/exec_pipeline', methods=['POST'])
 def exec_pipeline():
     # parse POST form args
-    query = request.form['q']
+    query_text = request.form['q']
     postproc_module = request.form.get('postproc_module', None) # default to no postproc module
     postproc_extra_prms = request.form.get('postproc_extra_prms', None)
     if postproc_extra_prms:
         postproc_extra_prms = json.loads(postproc_extra_prms)
     custom_local_path = request.form.get('custom_local_path', None)
     # < default to returning list only if not using postproc module >
-    return_dfiles_list = request.form.get('return_dfiles_list', (postproc_module == None))
+    return_dfiles_list = request.form.get('return_dfiles_list', (postproc_module is None))
     return_dfiles_list = (int(return_dfiles_list) == 1)
 
     # prepare query params
@@ -93,8 +91,8 @@ def exec_pipeline():
     if 'num_results' in request.form:
         query_params['num_results'] = int(request.form['num_results'])
     # execute query
-    query_res_list = http_service_helper.imsearch_query(query, query_params, query_timeout)
-    print 'Query for %s completed: %d results retrieved' % (query, len(query_res_list))
+    query_res_list = http_service_helper.imsearch_query(query_text, query_params, query_timeout)
+    print 'Query for %s completed: %d results retrieved' % (query_text, len(query_res_list))
     #query_res_list = query_res_list[:5] # DEBUG CODE
     # prepare download params
     imgetter_params = dict()
@@ -105,7 +103,7 @@ def exec_pipeline():
         if param_nm in request.form:
             imgetter_params[param_nm] = int(request.form[param_nm])
     # download images
-    print 'Downloading for %s started: %d sec improc_timeout, %d sec per_image_timeout' % (query,
+    print 'Downloading for %s started: %d sec improc_timeout, %d sec per_image_timeout' % (query_text,
                                                                                            imgetter_params['improc_timeout'] if imgetter_params['improc_timeout'] else -1,
                                                                                            imgetter_params['per_image_timeout'] if imgetter_params['per_image_timeout'] else -1)
     dfiles_list = http_service_helper.imsearch_download_to_static(query_res_list,
@@ -114,7 +112,7 @@ def exec_pipeline():
                                                                   custom_local_path,
                                                                   imgetter_params,
                                                                   zmq_context)
-    print 'Downloading for %s completed: %d images retrieved' % (query, len(dfiles_list))
+    print 'Downloading for %s completed: %d images retrieved' % (query_text, len(dfiles_list))
     # convert pathnames to URL paths (if not running locally and specifying
     # a custom path)
     if not custom_local_path:
@@ -122,12 +120,12 @@ def exec_pipeline():
 
     if return_dfiles_list:
         return Response(json.dumps(dfiles_list), mimetype='application/json')
-    else:
-        return 'DONE'
+
+    return 'DONE'
 
 
 if __name__ == '__main__':
-    if len(sys.argv)>1:
+    if len(sys.argv) > 1:
         SERVER_PORT = int(sys.argv[1])
     else:
         SERVER_PORT = DEFAULT_SERVER_PORT

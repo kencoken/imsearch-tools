@@ -1,14 +1,13 @@
 #!/usr/bin/env python
 
 import os
-from socket import *
-from flask import json
-from gevent_zeromq import zmq
-from time import sleep
+import socket
 import random
-
 import logging
 log = logging.getLogger(__name__)
+
+from gevent_zeromq import zmq
+from flask import json
 
 TCP_TERMINATOR = "$$$"
 SUCCESS_FIELD = "success"
@@ -16,7 +15,7 @@ TCP_TIMEOUT = 86400.00
 
 def callback_func(out_dict, extra_prms=None):
     # connect to VISOR backend service
-    sock = socket(AF_INET, SOCK_STREAM)
+    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
     debug_cb_id = random.getrandbits(128)
     debug_cb_id = '%032x' % debug_cb_id
@@ -32,7 +31,7 @@ def callback_func(out_dict, extra_prms=None):
     (featfn, imext) = os.path.splitext(imfn)
     featfn += '.bin'
     featpath = os.path.join(extra_prms['featdir'], featfn)
-    extra_params=dict()
+    extra_params = dict()
     if 'detector' in extra_prms:
         extra_params['detector'] = extra_prms['detector']
     # construct VISOR backend function call
@@ -73,7 +72,7 @@ def callback_func(out_dict, extra_prms=None):
                 break
             response = response + rep_chunk
             term_idx = response.find(TCP_TERMINATOR)
-        except timeout:
+        except socket.timeout:
             log.error('VISOR CATEGORY: Socket timeout! (%s)', debug_cb_id)
             sock.close()
             log.debug('VISOR CATEGORY: Closed socket (%s)', debug_cb_id)

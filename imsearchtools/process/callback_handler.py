@@ -120,5 +120,3 @@ class CallbackHandler(object):
     def _dec_task_count_skipped(self):
         self.task_count = self.task_count - 1
         log.debug('Skipped post-computation, remaining tasks: %d', self.task_count)
-
-    

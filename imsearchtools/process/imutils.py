@@ -8,11 +8,11 @@ Created on: 19 Oct 2012
 """
 
 from PIL import Image as PILImage
-import math
 
 def image_exists(fn):
     try:
-        with open(fn) as f: pass
+        with open(fn) as f:
+            pass
     except IOError as e:
         return False
     return True
@@ -26,7 +26,7 @@ def load_image(fn):
 def save_image(fn, im):
     im.save(fn)
 
-def downsize_by_max_dims(im, shape=(10000,10000)):
+def downsize_by_max_dims(im, shape=(10000, 10000)):
     w, h = im.size
     sf = 1.0
     if h > shape[0]:
@@ -38,11 +38,11 @@ def downsize_by_max_dims(im, shape=(10000,10000)):
     if sf < 1.0:
         resized = im.resize((int(sf*w), int(sf*h)), PILImage.ANTIALIAS)
         return resized
-    else:
-        return im
-        
 
-def create_thumbnail(im, shape=(128,128), pad_to_size=True):
+    return im
+
+
+def create_thumbnail(im, shape=(128, 128), pad_to_size=True):
     resized = downsize_by_max_dims(im, shape)
     nw, nh = im.size
     resized = im.resize((nw, nh), PILImage.ANTIALIAS)
@@ -50,16 +50,16 @@ def create_thumbnail(im, shape=(128,128), pad_to_size=True):
         thumbnail = PILImage.new('RGB', shape)
         cx = int((shape[1] - nw) / 2.0)
         cy = int((shape[0] - nh) / 2.0)
-        thumbnail.paste(resized, (cy,cx))
+        thumbnail.paste(resized, (cy, cx))
         return thumbnail
-    else:
-        return resized
+
+    return resized
 
 class LazyImage(object):
     def __init__(self, filename):
         self.filename = filename
         self._image = None
-    
+
     @property
     def image(self):
         if self._image is None:

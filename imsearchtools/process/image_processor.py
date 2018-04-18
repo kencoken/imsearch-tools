@@ -9,10 +9,9 @@ Created on: 19 Oct 2012
 
 import os
 import urlparse
-
+import logging
 from PIL import Image as PILImage
 import imutils
-import logging
 
 log = logging.getLogger(__name__)
 
@@ -21,7 +20,8 @@ class FilterException(Exception):
 
 
 class ImageProcessorSettings(object):
-    """Settings class for ImageProcessor
+    """
+    Settings class for ImageProcessor
 
     Defines the following setting groups:
     
@@ -32,46 +32,49 @@ class ImageProcessorSettings(object):
     """
 
     def __init__(self):
-        self.filter = dict(min_width = 1,
-                           min_height = 1,
-                           max_width = 10000,
-                           max_height = 10000,
-                           max_size_bytes = 2*4*1024*1024, #2 MP
-                           remove_flickr_placeholders = False)
+        self.filter = dict(min_width=1,
+                           min_height=1,
+                           max_width=10000,
+                           max_height=10000,
+                           max_size_bytes=2*4*1024*1024, #2 MP
+                           remove_flickr_placeholders=False)
 
-        self.conversion = dict(format = 'jpg',
-                               suffix = '-clean',
-                               max_width = 10000,
-                               max_height = 10000,
-                               subdir = '')
+        self.conversion = dict(format='jpg',
+                               suffix='-clean',
+                               max_width=10000,
+                               max_height=10000,
+                               subdir='')
 
-        self.thumbnail = dict(format = 'jpg',
-                              suffix = '-thumb',
-                              subdir = '',
-                              width = 90,
-                              height = 90,
-                              pad_to_size = True)
+        self.thumbnail = dict(format='jpg',
+                              suffix='-thumb',
+                              subdir='',
+                              width=90,
+                              height=90,
+                              pad_to_size=True)
 
     
 class ImageProcessor(object):
-    """Base class providing utility methods for cleaning up images downloaded
+    """
+    Base class providing utility methods for cleaning up images downloaded
     from the web. Requires the subclass to define the following:
 
     Attributes:
         opts - ImageProcessorSettings class containing settings for the image processor
     """
 
+    def __init__(self, opts=ImageProcessorSettings()):
+        self.opts = opts
+
     # Create filenames
-    
     def _filename_from_urldata(self, urldata):
         extension = os.path.splitext(urlparse.urlparse(urldata['url']).path)[1]
         fn = urldata['image_id'] + extension
         return fn
 
     def _clean_filename_from_filename(self, fn):
-        clean_fn =  (os.path.splitext(fn)[0] +
-                     self.opts.conversion['suffix'] + '.' +
-                     self.opts.conversion['format'].lower())
+        clean_fn = (os.path.splitext(fn)[0] +
+                    self.opts.conversion['suffix'] + '.' +
+                    self.opts.conversion['format'].lower())
         if self.opts.conversion['subdir']:
             clean_fn = os.path.join(self.opts.conversion['subdir'], clean_fn)
         return clean_fn
@@ -88,7 +91,8 @@ class ImageProcessor(object):
 
     # Process image and standardize it
     def process_image(self, fn):
-        """Process a single image, saving a cleaned up version of the image + thumbnail
+        """
+        Process a single image, saving a cleaned up version of the image + thumbnail
 
         Args:
             fn: the filename of the image to process
@@ -96,7 +100,6 @@ class ImageProcessor(object):
         Returns:
             A tuple (clean_fn, thumb_fn) containing the filenames of the saved
             cleaned up image and thumbnail
-            
         """
         im = imutils.LazyImage(fn)
         self._filter_image(fn)

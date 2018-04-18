@@ -1,12 +1,12 @@
 import os
 import sys
-
-file_dir = os.path.dirname(os.path.realpath(__file__))
-sys.path.append(os.path.join(file_dir, '..'))
-from imsearchtools import query as image_query
-
 import requests
 import re
+
+FILE_DIR = os.path.dirname(os.path.realpath(__file__))
+sys.path.append(os.path.join(FILE_DIR, '..'))
+from imsearchtools import query as image_query
+
 
 class TestGoogleWeb(object):
 
@@ -45,7 +45,7 @@ class TestGoogleWeb(object):
 
         # test2: two consecutive QUERYS return the same number of results
         res2 = self._gws.query(self._q, size='medium', style='photo',
-                              num_results=len(image_urls))
+                               num_results=len(image_urls))
         assert len(res) == len(res2)
 
         # test3: two consecutive QUERYS contain the same urls as result (not necessarily in the same order)

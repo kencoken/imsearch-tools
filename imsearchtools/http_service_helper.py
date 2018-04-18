@@ -54,7 +54,9 @@ def imsearch_download_to_static(query_res_list, postproc_module=None,
         os.makedirs(outdir)
 
     # add zmq context and socket as extra parameter if required
-    if type(postproc_extra_prms) is not dict: postproc_extra_prms = {}
+    if type(postproc_extra_prms) is not dict:
+        postproc_extra_prms = {}
+
     if zmq_context:
         postproc_extra_prms['zmq_context'] = zmq_context
     # *** pre-creating a connection seems to cause the gevent threads to hang on joining so disable for now ***
@@ -71,10 +73,10 @@ def imsearch_download_to_static(query_res_list, postproc_module=None,
         if postproc_extra_prms:
             return imgetter.process_urls(query_res_list, outdir, callback_func,
                                          completion_extra_prms=postproc_extra_prms)
-        else:
-            return imgetter.process_urls(query_res_list, outdir, callback_func)
-    else:
-        return imgetter.process_urls(query_res_list, outdir)
+
+        return imgetter.process_urls(query_res_list, outdir, callback_func)
+
+    return imgetter.process_urls(query_res_list, outdir)
 
 def make_url_dfiles_list(dfiles_list):
     cwd = os.getcwd()
@@ -90,7 +92,7 @@ def get_postproc_modules():
 
 def test_callback():
     cbhandler = image_process.CallbackHandler(test_func, 100, 50)
-    for i in range(0,100):
+    for i in range(0, 100):
         cbhandler.run_callback()
     print 'Done launching callbacks!'
     cbhandler.join()
