@@ -104,14 +104,16 @@ class ImageGetter(ImageProcessor):
         log.info('Downloading URL: %s', url)
         response = None
         try:
-            response = requests.get(url, timeout=self.image_timeout, stream=True)
+            response = requests.get(url, timeout=self.image_timeout, stream=True, verify=False)
         except Exception as e:
             log.info('Exception while downloading from %s: %s' % (url, str(e)))
             response = None
         if response:
-            with open(output_fn, 'wb') as out_file:
-                shutil.copyfileobj(response.raw, out_file)
-
+            try:
+                with open(output_fn, 'wb') as out_file:
+                    shutil.copyfileobj(response.raw, out_file)
+            except Exception as e:
+                log.info('Exception while saving %s: %s' % (output_fn, str(e)))
 
     def process_urls(self, urls, output_dir, completion_func=None,
                      completion_worker_count=-1, completion_extra_prms=None, process_images=True):
