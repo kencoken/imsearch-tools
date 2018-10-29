@@ -106,11 +106,16 @@ class ImageGetter(ImageProcessor):
 
         log.info('Downloading URL: %s', url)
         request = urllib2.Request(url, headers=self.headers)
-        r = urllib2.urlopen(request, timeout=self.image_timeout)
+        r = None
+        try:
+            r = urllib2.urlopen(request, timeout=self.image_timeout)
+        except Exception as e:
+            log.info('Exception while downloading URL: %s', str(e))
+            r = None
+        if r:
+            with open(output_fn, 'w') as f:
+                f.write(r.read())
 
-        with open(output_fn, 'w') as f:
-            f.write(r.read())
-        
     def process_urls(self, urls, output_dir, completion_func=None,
                      completion_worker_count=-1, completion_extra_prms=None, process_images=True):
         """Process returned list of URL dicts returned from search client class
