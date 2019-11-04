@@ -21,6 +21,8 @@ class FlickrAPISearch(requests.Session, SearchClient):
     http://www.flickr.com/services/api/
     For a reference use the Explorer:
     https://www.flickr.com/services/api/explore/flickr.photos.search
+    For help and bus reports try:
+    https://www.flickr.com/help/forum/
     """
     
     def __init__(self, async_query=True, timeout=5.0, **kwargs):
