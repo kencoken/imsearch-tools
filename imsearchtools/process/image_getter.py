@@ -173,6 +173,8 @@ class ImageGetter(ImageProcessor):
                 except (Timeout, IndexError):
                     job.kill(block=True)
                     timeout_occurred = True
+                except Exception:
+                    job.kill(block=True)
 
             # only wait for callback handler if timeout didn't occur
             # (as timeout will cause uncompleted gevent jobs to be forcibly ended
