@@ -3,7 +3,7 @@
 import os
 import socket
 from flask import json
-from gevent_zeromq import zmq
+import zmq
 
 TCP_TERMINATOR = "$$$"
 SUCCESS_FIELD = "success"

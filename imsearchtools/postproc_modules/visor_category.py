@@ -6,7 +6,7 @@ import random
 import logging
 log = logging.getLogger(__name__)
 
-from gevent_zeromq import zmq
+import zmq
 from flask import json
 
 TCP_TERMINATOR = "$$$"
