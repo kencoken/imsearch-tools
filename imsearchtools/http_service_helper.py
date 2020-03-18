@@ -3,10 +3,9 @@
 import os
 
 from flask import request
-
-from imsearchtools import query as image_query
-from imsearchtools import process as image_process
-from imsearchtools import postproc_modules
+from imsearchtools.engines import google_web as image_query
+from imsearchtools.process import image_processor, image_getter, callback_handler
+from imsearchtools.postproc_modules import module_finder
 
 
 def imsearch_query(query, query_params, query_timeout=-1.0, engine='google_web'):
@@ -18,7 +17,7 @@ def imsearch_query(query, query_params, query_timeout=-1.0, engine='google_web')
     if engine == 'google_web':
         searcher = image_query.GoogleWebSearch(**searcher_args)
     else:
-        raise ValueError('Unkown query engine')
+        raise ValueError('Unknown query engine')
     # execute the query
     return searcher.query(query, **query_params)
 
@@ -37,14 +36,14 @@ def imsearch_download_to_static(query_res_list, postproc_module=None,
         do_width_resize = ('resize_width' in imgetter_params and imgetter_params['resize_width'] > 0)
         do_height_resize = ('resize_height' in imgetter_params and imgetter_params['resize_height'] > 0)
         if do_width_resize or do_height_resize:
-            improc_settings = image_process.ImageProcessorSettings()
+            improc_settings = image_processor.ImageProcessorSettings()
             if do_width_resize:
                 improc_settings.conversion['max_width'] = imgetter_params['resize_width']
             if do_height_resize:
                 improc_settings.conversion['max_height'] = imgetter_params['resize_height']
             ig_params['opts'] = improc_settings
 
-    imgetter = image_process.ImageGetter(**ig_params)
+    imgetter = image_getter.ImageGetter(**ig_params)
         
     if not custom_local_path:
         outdir = os.path.join(os.getcwd(), 'static')
@@ -69,7 +68,7 @@ def imsearch_download_to_static(query_res_list, postproc_module=None,
     # if a postprocessing module is defined, find the callback function
     # of the module
     if postproc_module:
-        callback_func = postproc_modules.get_module_callback(postproc_module)
+        callback_func = module_finder.get_module_callback(postproc_module)
         if postproc_extra_prms:
             return imgetter.process_urls(query_res_list, outdir, callback_func,
                                          completion_extra_prms=postproc_extra_prms)
@@ -88,15 +87,15 @@ def make_url_dfiles_list(dfiles_list):
     return dfiles_list
 
 def get_postproc_modules():
-    return postproc_modules.get_module_list()
+    return module_finder.get_module_list()
 
 def test_callback():
-    cbhandler = image_process.CallbackHandler(test_func, 100, 50)
+    cbhandler = callback_handler.CallbackHandler(test_func, 100, 50)
     for i in range(0, 100):
         cbhandler.run_callback()
-    print 'Done launching callbacks!'
+    print ('Done launching callbacks!')
     cbhandler.join()
-    print 'Done joining callbacks'
+    print ('Done joining callbacks')
 
 def test_func():
     import time

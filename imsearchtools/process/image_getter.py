@@ -11,7 +11,7 @@ import shutil
 import os
 import time
 import logging
-from httplib import BadStatusLine
+from http.client import BadStatusLine
 import requests
 
 import gevent
@@ -19,10 +19,10 @@ from gevent.timeout import Timeout
 from gevent import monkey
 monkey.patch_socket()
 
-from image_processor import *
-import imutils
-
-from callback_handler import CallbackHandler
+from .image_processor import *
+from . import imutils
+from imsearchtools.process import callback_handler
+#from callback_handler import CallbackHandler
 
 #logging.basicConfig(level=logging.INFO)
 log = logging.getLogger(__name__)
@@ -55,20 +55,20 @@ class ImageGetter(ImageProcessor):
             else:
                 clean_fn = None
                 thumb_fn = None
-        except requests.ConnectionError, e:
+        except requests.ConnectionError as e:
             log.info('Connection Error for %s (%s)', urldata['url'], str(e))
             error_occurred = True
-        except requests.HTTPError, e:
+        except requests.HTTPError as e:
             if e.code != 201:
                 log.info('HTTP Error for %s (%s)', urldata['url'], str(e))
                 error_occurred = True
-        except BadStatusLine, e:
+        except BadStatusLine as e:
             log.info('Bad status line for %s (%s)', urldata['url'], str(e))
             error_occurred = True
-        except IOError, e:
+        except IOError as e:
             log.info('IO Error for: %s (%s)', urldata['url'], str(e))
             error_occurred = True
-        except FilterException, e:
+        except FilterException as e:
             log.info('Filtered out: %s (%s)', urldata['url'], str(e))
             error_occurred = True
 
@@ -146,7 +146,7 @@ class ImageGetter(ImageProcessor):
         # prepare workers for callback if using callback function
         # returned process will end once all callbacks have been completed
         if completion_func:
-            self._callback_handler = CallbackHandler(completion_func,
+            self._callback_handler = callback_handler.CallbackHandler(completion_func,
                                                      len(urls),
                                                      completion_worker_count)
 

@@ -51,7 +51,7 @@ def callback_func(out_dict, extra_prms=None):
     total_sent = 0
     while total_sent < len(request):
         log.debug('VISOR CATEGORY: Sending request chunk (%s)...', debug_cb_id)
-        sent = sock.send(request[total_sent:])
+        sent = sock.send(request[total_sent:].encode())
         if sent == 0:
             raise RuntimeError("VISOR CATEGORY: Socket connection broken")
         total_sent = total_sent + sent
@@ -65,6 +65,7 @@ def callback_func(out_dict, extra_prms=None):
         try:
             log.debug('VISOR CATEGORY: Receiving response chunk (%s)...', debug_cb_id)
             rep_chunk = sock.recv(1024)
+            rep_chunk = rep_chunk.decode()
             if not rep_chunk:
                 log.error('VISOR CATEGORY: Connection closed! (%s)', debug_cb_id)
                 sock.close()
@@ -105,8 +106,8 @@ def callback_func(out_dict, extra_prms=None):
                 log.info('VISOR CATEGORY: Reusing ZMQ_SOCKET')
                 impath_sender = extra_prms['zmq_impath_return_sock']
 
-            impath_sender.send(str(out_dict['clean_fn']))
-            impath_sender.recv()
+            impath_sender.send_string(str(out_dict['clean_fn']))
+            impath_sender.recv_string()
             log.info('VISOR CATEGORY: Completed request')
 
         finally:

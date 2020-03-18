@@ -5,9 +5,6 @@ import gevent
 class QueryException(Exception):
     pass
 
-class NoAPICredentials(Exception):
-    pass
-
 ## Search Classes
 #  --------------------------------------------
 
@@ -50,7 +47,7 @@ class SearchClient(object):
             return size
         if size not in self._supported_sizes_map:
             # do not completely abort because of this
-            print "**** WARNING: Unsupported size '%s'. Ignoring value. ****" % size
+            print ("**** WARNING: Unsupported size '%s'. Ignoring value. ****" % size)
             return ''
 
         return self._supported_sizes_map[size]
@@ -60,7 +57,7 @@ class SearchClient(object):
             return style
         if style not in self._supported_styles_map:
             # do not completely abort because of this
-            print "**** WARNING: Unsupported style '%s'. Ignoring value. ****" % style
+            print ("**** WARNING: Unsupported style '%s'. Ignoring value. ****" % style)
             return ''
 
         return self._supported_styles_map[style]

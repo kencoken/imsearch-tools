@@ -5,7 +5,7 @@ import math
 from hashlib import md5
 
 import requests
-from search_client import SearchClient
+from .search_client import SearchClient
 
 ## Engine Configuration
 #  --------------------------------------------
@@ -100,7 +100,7 @@ class GoogleWebSearch(requests.Session, SearchClient):
 
             # package for output
             resp_dict = [{'url': item[0],
-                          'image_id': md5(item[1]).hexdigest(),
+                          'image_id': md5( item[1].encode('utf-8') ).hexdigest(),
                           'rank': result_offset+index+1} for index, item in enumerate(image_data)]
 
             return resp_dict
