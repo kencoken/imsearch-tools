@@ -10,7 +10,7 @@ from search_client import *
 ## Engine Configuration
 #  --------------------------------------------
 
-GOOGLE_WEB_ENTRY = 'http://www.google.com/'
+GOOGLE_WEB_ENTRY = 'https://www.google.com/'
 GOOGLE_WEB_FUNC = 'search'
 
 ## Search Class
@@ -21,11 +21,9 @@ class GoogleWebSearch(requests.Session, SearchClient):
     See https://www.google.com/advanced_image_search
 
     This class does not use any API, but instead extracts results directly from the
-    web search pages (acting as Firefox v25.0).
-
-    Created November 2013.
+    web search pages (acting as Firefox).
     """
-    
+
     def __init__(self, async_query=True, timeout=5.0, **kwargs):
         super(GoogleWebSearch, self).__init__()
 
@@ -42,28 +40,12 @@ class GoogleWebSearch(requests.Session, SearchClient):
                                       'face': 'face',
                                       'animated': 'animated'}
         self.async_query = async_query
+        self.acceptable_extensions = { "jpg", "jpeg", "png", "JPG", "JPEG", "PNG" }
 
-    def _url_clean_up(self, url):
-        """ 
-        Some extracted urls can include search parameters after the image file name or can contain complicated encoded redirections.
-        This method does its best to clean up image url. After that it just assumes the url is correct and returns it.
-        """
-        if url!=None and url!="":
-            if '?' in url:
-                url = url.split('?')[0]
-            if '\\' in url:
-                url = url.split('\\')[0]
-            if '$' in url:
-                url = url.split('$')[0]
-            # add further filter her is necessary    
-        return url
-    
+
     def _fetch_results_from_offset(self, query, result_offset,
                                    aux_params={}, headers={},
                                    num_results=-1):
-
-        image_div_pattern = re.compile(r'class="rg_meta(.*?)</div>')
-        image_url_pattern = re.compile(r'"ou":"(.*?)"')
 
         try:
             page_idx = int(math.floor(result_offset/float(self._results_per_req)))
@@ -78,15 +60,14 @@ class GoogleWebSearch(requests.Session, SearchClient):
                             params=aux_params, headers=headers)
             resp_str = resp.text
 
-            image_divs = image_div_pattern.findall(resp_str)
+            html = resp_str.split('["')
             image_data = []
-            for div in image_divs:
-                image_url_match = image_url_pattern.search(div)
-                url = image_url_match.group(1)
-                url = self._url_clean_up(url)
-                name = url.rsplit('/', 1)[-1]
-                if url and name:
-                    image_data.append((url, name))
+            for item in html:
+                if item.startswith('http') and item.split('"')[0].split('.')[-1] in self.acceptable_extensions:
+                    url = item.split('"')[0]
+                    name = url.rsplit('/', 1)[-1]
+                    if url and name:
+                        image_data.append((url, name))
 
             # modify returned results list according to input params
             # (if necessary)
@@ -105,7 +86,8 @@ class GoogleWebSearch(requests.Session, SearchClient):
             return resp_dict
         except requests.exceptions.RequestException:
             return []
-        
+
+
     def query(self, query, size='medium', style='photo', num_results=100):
         # prepare query parameters
         size = self._size_to_native_size(size)
@@ -121,7 +103,7 @@ class GoogleWebSearch(requests.Session, SearchClient):
         # prepare shared parameters
         aux_params['tbm'] = 'isch' #image search mode
         aux_params['ijn'] = 0      # causes AJAX request contents only to be returned
-            
+
         headers = {'User-Agent': 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:58.0) Gecko/20100101 Firefox/58.0'}
 
         # do request
@@ -129,6 +111,5 @@ class GoogleWebSearch(requests.Session, SearchClient):
                                       num_results,
                                       aux_params=aux_params,
                                       headers=headers)
-        
+
         return results
-    
