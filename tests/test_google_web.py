@@ -13,21 +13,6 @@ class TestGoogleWeb(object):
         self._gws = image_query.GoogleWebSearch(False)
         self._q = 'polka dots'
 
-    def _url_clean_up(self, url):
-        """
-        Some extracted urls can include search parameters after the image file name or can contain complicated encoded redirections.
-        This method does its best to clean up image url. After that it just assumes the url is correct and returns it.
-        """
-        if url != None and url != "":
-            if '?' in url:
-                url = url.split('?')[0]
-            if '\\' in url:
-                url = url.split('\\')[0]
-            if '$' in url:
-                url = url.split('$')[0]
-            # add further filter her is necessary
-        return url
-
     def test_images_returned(self):
         print ("**test_images_returned")
         res = self._gws.query(self._q, num_results=100)
@@ -40,7 +25,7 @@ class TestGoogleWeb(object):
 
     def test_ranking_correct(self):
         print ("**test_ranking_correct")
-        url = 'http://www.google.com/search'
+        url = 'https://www.google.com/search'
         aux_params = {}
         aux_params['as_q'] = self._q
         aux_params['tbm'] = 'isch'
@@ -49,28 +34,23 @@ class TestGoogleWeb(object):
         aux_params['imgtype'] = 'photo'
         headers = {'User-Agent': 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:58.0) Gecko/20100101 Firefox/58.0'}
 
+        # test1: the GET and the QUERY return the same number of results
+        print ("test1: the GET and the QUERY return the same number of results")
+
         resp = requests.get(url, params=aux_params, headers=headers)
         resp_str = resp.text
 
-        image_div_pattern = re.compile(r'class="rg_meta(.*?)</div>')
-        image_url_pattern = re.compile(r'"ou":"(.*?)"')
-
-        image_divs = image_div_pattern.findall(resp_str)
-
+        html = resp_str.split('["')
         image_urls = []
-        for div in image_divs:
-            image_url_match = image_url_pattern.search(div)
-            url = image_url_match.group(1)
-            url = self._url_clean_up(url)
-            name = url.rsplit('/', 1)[-1]
-            if url and name:
-                image_urls.append(url)
+        for item in html:
+            if item.startswith('http') and item.split('"')[0].split('.')[-1] in self._gws.acceptable_extensions:
+                image_urls.append(item.split('"')[0])
 
         print ("URLs after standard GET:", len(image_urls))
-        # test1: the GET and the QUERY return the same number of results
-        print ("test1: the GET and the QUERY return the same number of results")
+
         res = self._gws.query(self._q, size='medium', style='photo',
                               num_results=len(image_urls))
+
         print ("URLs after QUERY", len(res))
         assert len(res) == len(image_urls)
 
