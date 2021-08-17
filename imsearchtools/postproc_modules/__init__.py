@@ -1,1 +1,1 @@
-from module_finder import *
+from .module_finder import *

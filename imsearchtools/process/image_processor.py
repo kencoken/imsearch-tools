@@ -8,10 +8,10 @@ Created on: 19 Oct 2012
 """
 
 import os
-import urlparse
+import urllib.parse
 
 from PIL import Image as PILImage
-import imutils
+from .import imutils
 import logging
 
 log = logging.getLogger(__name__)
@@ -134,18 +134,18 @@ class ImageProcessor(object):
         nbytes = w * h * len(im.mode)
 
         if w < self.opts.filter['min_width']:
-            raise FilterException, 'w < min_width'
+            raise FilterException('w < min_width')
         if h < self.opts.filter['min_height']:
-            raise FilterException, 'h < min_height'
+            raise FilterException('h < min_height')
         if w > self.opts.filter['max_width']:
-            raise FilterException, 'w > max_width'
+            raise FilterException('w > max_width')
         if h > self.opts.filter['max_height']:
-            raise FilterException, 'h > max_height'
+            raise FilterException('h > max_height')
         if nbytes > self.opts.filter['max_size_bytes']:
-            raise FilterException, 'nbytes > max_size_bytes'
+            raise FilterException('nbytes > max_size_bytes')
 
     def _filter_flickr_placeholder(self, fn):
         import hashlib
         with open(fn) as fid:
             if hashlib.sha256(fid.read()).hexdigest() == '0f28f49410a89e24c95acfd345210cc6f2294814584ad7c60f698fee74e46aad':
-                raise FilterException, 'Flickr placeholder image filtered'
+                raise FilterException('Flickr placeholder image filtered')

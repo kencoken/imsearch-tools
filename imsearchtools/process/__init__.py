@@ -1,2 +1,2 @@
-from image_getter import *
-from image_processor import ImageProcessorSettings
+from .image_getter import *
+from .image_processor import ImageProcessorSettings

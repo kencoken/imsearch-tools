@@ -5,8 +5,8 @@ import re
 import math
 from hashlib import md5
 
-from search_client import *
-from api_credentials import *
+from .search_client import *
+from .api_credentials import *
 
 ## API Configuration
 #  --------------------------------------------
