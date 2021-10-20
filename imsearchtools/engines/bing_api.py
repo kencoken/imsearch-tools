@@ -8,8 +8,8 @@ try:
 except ImportError:
     import json # Python 2.6+ only
 
-from search_client import *
-from api_credentials import *
+from .search_client import *
+from .api_credentials import *
 
 ## API Configuration
 #  --------------------------------------------
@@ -55,8 +55,8 @@ class BingAPISearch(requests.Session, SearchClient):
             quoted_query = "'%s'" % query
 
             if DEBUG_MESSAGES:
-                print quoted_query
-                print BING_API_FUNC
+                print(quoted_query)
+                print(BING_API_FUNC)
 
             req_result_count = min(self._results_per_req, num_results-result_offset)
 
@@ -65,7 +65,7 @@ class BingAPISearch(requests.Session, SearchClient):
             aux_params['$skip'] = result_offset
             aux_params['$top'] = req_result_count
             if DEBUG_MESSAGES:
-                print aux_params
+                print(aux_params)
 
             resp = self.get(BING_API_ENTRY + BING_API_FUNC, params=aux_params,
                             headers=headers)
@@ -74,11 +74,11 @@ class BingAPISearch(requests.Session, SearchClient):
             # extract list of results from response
             result_dict = resp.json()
             if DEBUG_MESSAGES:
-                print json.dumps(result_dict)
+                print(json.dumps(result_dict))
 
             return result_dict['d']['results'][:(num_results-result_offset)]
-        except requests.exceptions.RequestException, e:
-            print 'error occurred: ' + str(e)
+        except requests.exceptions.RequestException as e:
+            print('error occurred: ' + str(e))
             return []
 
     def __bing_results_to_results(self, results):

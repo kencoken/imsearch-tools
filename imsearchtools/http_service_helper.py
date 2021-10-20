@@ -100,9 +100,9 @@ def test_callback():
     cbhandler = image_process.CallbackHandler(test_func, 100, 50)
     for i in range(0,100):
         cbhandler.run_callback()
-    print 'Done launching callbacks!'
+    print('Done launching callbacks!')
     cbhandler.join()
-    print 'Done joining callbacks'
+    print('Done joining callbacks')
 
 def test_func():
     import time
