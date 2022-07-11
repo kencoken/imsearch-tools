@@ -54,8 +54,14 @@ class GoogleWebSearch(requests.Session, SearchClient):
             aux_params['as_q'] = query
             aux_params['ijn'] = page_idx  # ijn is the AJAX page index (0 = first page)
 
+            # When making a google search we are redirected to a page
+            # to give tracking consent.  Maybe we should give the
+            # consent properly and get back a cookie but apparently we
+            # can hack it with a 'CONSENT' cookie set to 'YES+' (see
+            # issue #28 and https://stackoverflow.com/questions/70560247/)
             resp = self.get(GOOGLE_WEB_ENTRY + GOOGLE_WEB_FUNC,
-                            params=aux_params, headers=headers)
+                            params=aux_params, headers=headers,
+                            cookies={'CONSENT' : 'YES+'})
             resp_str = resp.text
 
             html = resp_str.split('["')
