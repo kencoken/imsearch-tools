@@ -104,7 +104,7 @@ class ImageGetter(ImageProcessor):
         log.info('Downloading URL: %s', url)
         response = None
         try:
-            response = requests.get(url, timeout=self.image_timeout, stream=True, verify=False)
+            response = requests.get(url, timeout=self.image_timeout, stream=True)
         except Exception as e:
             log.info('Exception while downloading from %s: %s' % (url, str(e)))
             response = None
