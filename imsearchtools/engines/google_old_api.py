@@ -3,8 +3,8 @@
 import requests
 from hashlib import md5
 
-from search_client import *
-from api_credentials import *
+from .search_client import *
+from .api_credentials import *
 
 ## API Configuration
 #  --------------------------------------------
@@ -18,10 +18,10 @@ GOOGLE_OLD_API_FUNC = 'images'
 class GoogleOldAPISearch(requests.Session, SearchClient):
     """Wrapper class for Google Image Search API. For more details see:
     https://developers.google.com/image-search/
-    
+
     ** NOTE: As of 26 May 2011 the Image Search API has been deprecated **
     """
-    
+
     def __init__(self, async_query=True, timeout=5.0, **kwargs):
         super(GoogleOldAPISearch, self).__init__()
 
@@ -75,7 +75,7 @@ class GoogleOldAPISearch(requests.Session, SearchClient):
         # check input
         if num_results > 64:
             raise ValueError('Google API currently allows for a maximum of 64 results to be returend')
-        
+
         # prepare query parameters
         size = self._size_to_native_size(size)
         style = self._style_to_native_style(style)
@@ -97,4 +97,3 @@ class GoogleOldAPISearch(requests.Session, SearchClient):
                                       aux_params=aux_params)
 
         return self.__google_results_to_results(results)
-    

@@ -44,7 +44,7 @@ def query():
         query_params['num_results'] = int(request.args['num_results'])
     # execute query
     query_res_list = http_service_helper.imsearch_query(query, engine, query_params)
-    
+
     return Response(json.dumps(query_res_list), mimetype='application/json')
 
 @app.route('/download', methods=['POST'])
@@ -57,7 +57,7 @@ def download():
     dfiles_list = http_service_helper.imsearch_download_to_static(query_res_list)
     # convert pathnames to URL paths
     url_dfiles_list = http_service_helper.make_url_dfiles_list(dfiles_list)
-    
+
     return Response(json.dumps(url_dfiles_list), mimetype='application/json')
 
 @app.route('/get_postproc_module_list')
@@ -102,7 +102,7 @@ def exec_pipeline():
     # execute query
     query_res_list = http_service_helper.imsearch_query(query, engine,
                                                         query_params, query_timeout)
-    print 'Query for %s completed: %d results retrieved' % (query, len(query_res_list))
+    print('Query for %s completed: %d results retrieved' % (query, len(query_res_list)))
     #query_res_list = query_res_list[:5] # DEBUG CODE
     # prepare download params
     imgetter_params = dict()
@@ -113,16 +113,16 @@ def exec_pipeline():
         if param_nm in request.form:
             imgetter_params[param_nm] = int(request.form[param_nm])
     # download images
-    print 'Downloading for %s started: %d sec improc_timeout, %d sec per_image_timeout' % (query,
+    print('Downloading for %s started: %d sec improc_timeout, %d sec per_image_timeout' % (query,
                                                                                            imgetter_params['improc_timeout'] if imgetter_params['improc_timeout'] else -1,
-                                                                                           imgetter_params['per_image_timeout'] if imgetter_params['per_image_timeout'] else -1)
+                                                                                           imgetter_params['per_image_timeout'] if imgetter_params['per_image_timeout'] else -1))
     dfiles_list = http_service_helper.imsearch_download_to_static(query_res_list,
                                                                   postproc_module,
                                                                   postproc_extra_prms,
                                                                   custom_local_path,
                                                                   imgetter_params,
                                                                   zmq_context)
-    print 'Downloading for %s completed: %d images retrieved' % (query, len(dfiles_list))
+    print('Downloading for %s completed: %d images retrieved' % (query, len(dfiles_list)))
     # convert pathnames to URL paths (if not running locally and specifying
     # a custom path)
     if not custom_local_path:
@@ -139,7 +139,6 @@ if __name__ == '__main__':
         SERVER_PORT = int(sys.argv[1])
     else:
         SERVER_PORT = DEFAULT_SERVER_PORT
-    print "Starting imsearch_http_service on port", SERVER_PORT
+    print("Starting imsearch_http_service on port", SERVER_PORT)
     http_server = WSGIServer(('', SERVER_PORT), app)
     http_server.serve_forever()
-    

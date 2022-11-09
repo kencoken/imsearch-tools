@@ -3,8 +3,8 @@
 import requests
 from hashlib import md5
 
-from search_client import *
-from api_credentials import *
+from .search_client import *
+from .api_credentials import *
 
 ## API Configuration
 #  --------------------------------------------
@@ -24,7 +24,7 @@ class FlickrAPISearch(requests.Session, SearchClient):
     For help and bus reports try:
     https://www.flickr.com/help/forum/
     """
-    
+
     def __init__(self, async_query=True, timeout=5.0, **kwargs):
         super(FlickrAPISearch, self).__init__()
 
@@ -39,7 +39,7 @@ class FlickrAPISearch(requests.Session, SearchClient):
                                      'medium': 'n',
                                      'large': 'c'}
         self._supported_styles_map = {'photo': 'photo'}
-        
+
         self.async_query = async_query
 
     def _fetch_results_from_offset(self, query, result_offset,
@@ -92,7 +92,7 @@ class FlickrAPISearch(requests.Session, SearchClient):
     def query(self, query, size='medium', style='photo', num_results=100):
         # prepare query parameters
         size = self._size_to_native_size(size)
-        
+
         # prepare auxilary parameter list
         aux_params = {'method': FLICKR_API_METHOD,
                       'api_key': FLICKR_API_KEY,
@@ -105,6 +105,5 @@ class FlickrAPISearch(requests.Session, SearchClient):
         results = self._fetch_results(query,
                                       num_results,
                                       aux_params=aux_params)
-        
+
         return self.__flickr_results_to_results(results, size)
-    

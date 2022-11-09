@@ -1,1 +1,1 @@
-import result_page_gen
+from . import result_page_gen

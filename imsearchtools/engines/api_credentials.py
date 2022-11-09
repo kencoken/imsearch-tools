@@ -41,4 +41,3 @@ GOOGLE_API_CX = ''
 # http://www.flickr.com/services/api/
 FLICKR_API_KEY = ''
 FLICKR_API_SECRET = ''
-

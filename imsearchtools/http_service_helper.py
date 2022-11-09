@@ -53,7 +53,7 @@ def imsearch_download_to_static(query_res_list, postproc_module=None,
             ig_params['opts'] = improc_settings
 
     imgetter = image_process.ImageGetter(**ig_params)
-        
+
     if not custom_local_path:
         outdir = os.path.join(os.getcwd(), 'static')
     else:
@@ -100,9 +100,9 @@ def test_callback():
     cbhandler = image_process.CallbackHandler(test_func, 100, 50)
     for i in range(0,100):
         cbhandler.run_callback()
-    print 'Done launching callbacks!'
+    print('Done launching callbacks!')
     cbhandler.join()
-    print 'Done joining callbacks'
+    print('Done joining callbacks')
 
 def test_func():
     import time

@@ -8,8 +8,8 @@ try:
 except ImportError:
     import json # Python 2.6+ only
 
-from search_client import *
-from api_credentials import *
+from .search_client import *
+from .api_credentials import *
 
 ## API Configuration
 #  --------------------------------------------
@@ -50,13 +50,13 @@ class BingAPISearchV1(requests.Session, SearchClient):
                                    num_results=-1):
         if num_results == -1:
             num_results = self._results_per_req
-            
+
         try:
             quoted_query = "'%s'" % query
 
             if DEBUG_MESSAGES:
-                print quoted_query
-                print BING_API_FUNC
+                print(quoted_query)
+                print(BING_API_FUNC)
 
             req_result_count = min(self._results_per_req, num_results-result_offset)
 
@@ -65,32 +65,32 @@ class BingAPISearchV1(requests.Session, SearchClient):
             aux_params['$skip'] = result_offset
             aux_params['$top'] = req_result_count
             if DEBUG_MESSAGES:
-                print aux_params
+                print(aux_params)
 
             resp = self.get(BING_API_ENTRY + BING_API_FUNC, params=aux_params,
                             headers=headers)
             resp.raise_for_status()
-            
+
             # extract list of results from response
             result_dict = resp.json()
             if DEBUG_MESSAGES:
-                print json.dumps(result_dict)
+                print(json.dumps(result_dict))
 
             return result_dict['d']['results'][:(num_results-result_offset)]
-        except requests.exceptions.RequestException, e:
-            print 'error occurred: ' + str(e)
+        except requests.exceptions.RequestException as e:
+            print('error occurred: ' + str(e))
             return []
 
     def __bing_results_to_results(self, results):
         return [{'url': item['MediaUrl'],
                  'image_id': md5(item['ID']).hexdigest(),
                  'title': item['Title']} for item in results]
-    
+
     def query(self, query, size='medium', style='photo', num_results=100):
         # prepare query parameters
         size = self._size_to_native_size(size)
         style = self._style_to_native_style(style)
-        
+
         image_filters_list = []
         if size:
             image_filters_list.append('Size:%s' % size)
@@ -115,4 +115,3 @@ class BingAPISearchV1(requests.Session, SearchClient):
                                       aux_params=aux_params)
 
         return self.__bing_results_to_results(results)
-    

@@ -3,7 +3,7 @@
 import os
 from socket import *
 from flask import json
-from gevent_zeromq import zmq
+import zmq.green as zmq
 from time import sleep
 import random
 

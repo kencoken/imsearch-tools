@@ -3,10 +3,7 @@
 import os
 from socket import *
 from flask import json
-#try:
-from gevent_zeromq import zmq
-#except:
-#import zmq.green as zmq
+import zmq.green as zmq
 
 TCP_TERMINATOR = "$$$"
 SUCCESS_FIELD = "success"
@@ -71,7 +68,7 @@ def callback_func(out_dict, extra_prms=None):
     #    except timeout:
     #        print 'Socket timeout'
     #        sock.close()
-            
+
     sock.close()
 
     # return URL on ZMQ channel if specified in extra_prms

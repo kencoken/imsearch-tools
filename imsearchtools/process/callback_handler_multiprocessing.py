@@ -38,7 +38,7 @@ class CallbackHandler(object):
         # store requested task count and callback function
         self.task_count = task_count
         self.worker_func = worker_func
-        
+
         self.launched_tasks = 0
         self.skipped_tasks = 0
 
@@ -88,5 +88,3 @@ class CallbackHandler(object):
 def _callback_worker_func(self, worker_params):
     worker_func(*worker_params['args'], **worker_params['kwargs'])
     print 'Done with callback!'
-
-    

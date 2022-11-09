@@ -11,20 +11,21 @@ import gevent
 from gevent.timeout import Timeout
 
 from gevent import monkey; monkey.patch_socket()
-import urllib2
-from httplib import BadStatusLine
+import urllib.error
+import urllib.request
+from http.client import BadStatusLine
 
 #import requests
 import os
-import urlparse
+import urllib.parse
 import time
 
-from image_processor import *
+from .image_processor import *
 import imutils
 
 import logging
 
-from callback_handler import CallbackHandler
+from .callback_handler import CallbackHandler
 
 #logging.basicConfig(level=logging.INFO)
 log = logging.getLogger(__name__)
@@ -58,20 +59,20 @@ class ImageGetter(ImageProcessor):
             else:
                 clean_fn = None
                 thumb_fn = None
-        except urllib2.URLError, e:
+        except urllib.error.URLError as e:
             log.info('URL Error for %s (%s)', urldata['url'], str(e))
             error_occurred = True
-        except urllib2.HTTPError, e:
+        except urllib.error.HTTPError as e:
             if e.code != 201:
                 log.info('HTTP Error for %s (%s)', urldata['url'], str(e))
                 error_occurred = True
-        except BadStatusLine, e:
+        except BadStatusLine as e:
             log.info('Bad status line for %s (%s)', urldata['url'], str(e))
             error_occurred = True
-        except IOError, e:
+        except IOError as e:
             log.info('IO Error for: %s (%s)', urldata['url'], str(e))
             error_occurred = True
-        except FilterException, e:
+        except FilterException as e:
             log.info('Filtered out: %s (%s)', urldata['url'], str(e))
             error_occurred = True
 
@@ -98,17 +99,17 @@ class ImageGetter(ImageProcessor):
                 self._callback_handler.skip()
 
             return None
-        
+
     def _download_image(self, url, output_fn):
         if imutils.image_exists(output_fn):
             log.info('Output filename exists for URL: %s', url)
             return
 
         log.info('Downloading URL: %s', url)
-        request = urllib2.Request(url, headers=self.headers)
+        request = urllib.request.Request(url, headers=self.headers)
         r = None
         try:
-            r = urllib2.urlopen(request, timeout=self.image_timeout)
+            r = urllib.request.urlopen(request, timeout=self.image_timeout)
         except Exception as e:
             log.info('Exception while downloading URL: %s', str(e))
             r = None
@@ -137,7 +138,7 @@ class ImageGetter(ImageProcessor):
                   'clean_fn':'/path/to/processed/and/validated/image',
                   'thumb_fn':'/path/to/thumbnail'},
                   ...]
-            
+
         """
 
         # check input parameters
@@ -171,7 +172,7 @@ class ImageGetter(ImageProcessor):
             for job in jobs:
                 try:
                     job.get(block=False)
-                except Timeout, IndexError:
+                except (Timeout, IndexError):
                     job.kill(block=True)
                     timeout_occurred = True
 
@@ -192,5 +193,3 @@ class ImageGetter(ImageProcessor):
                 results.append(job.value)
 
         return results
-        
-

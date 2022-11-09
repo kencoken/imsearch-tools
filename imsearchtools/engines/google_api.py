@@ -3,8 +3,8 @@
 import requests
 from hashlib import md5
 
-from search_client import *
-from api_credentials import *
+from .search_client import *
+from .api_credentials import *
 
 ## API Configuration
 #  --------------------------------------------
@@ -25,7 +25,7 @@ class GoogleAPISearch(requests.Session, SearchClient):
        control panel to search 'the entire web, preferring listed websites' - apparently
        there is no way to search the web without specifying a list of custom URLs **
     """
-    
+
     def __init__(self, async_query=True, timeout=5.0, **kwargs):
         super(GoogleAPISearch, self).__init__()
 
@@ -70,8 +70,8 @@ class GoogleAPISearch(requests.Session, SearchClient):
 
         except requests.exceptions.RequestException:
             return []
-        
-    def __google_results_to_results(self, results):        
+
+    def __google_results_to_results(self, results):
         return [{'url': item['link'],
                  'image_id': md5(item['link']).hexdigest(),
                  'title': item['title']} for item in results]
@@ -80,7 +80,7 @@ class GoogleAPISearch(requests.Session, SearchClient):
         # check input
         if num_results > 100:
             raise ValueError('Google API currently allows for a maximum of 100 results to be returend')
-        
+
         # prepare query parameters
         size = self._size_to_native_size(size)
         style = self._style_to_native_style(style)
