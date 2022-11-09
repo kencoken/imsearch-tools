@@ -47,11 +47,11 @@ if test_bing_api_v1:
 
 if test_bing_api_v5:
     bing_api_searcher = image_query.BingAPISearchV5()
-    print 'Executing Bing API Search V5...'
+    print('Executing Bing API Search V5...')
     t = time.time()
     bing_api_results = bing_api_searcher.query(test_query_str)
     bing_api_timing = time.time() - t
-    print 'Retrieved %d results in %f seconds' % (len(bing_api_results), bing_api_timing)
+    print('Retrieved %d results in %f seconds' % (len(bing_api_results), bing_api_timing))
 
     result_page_gen.gen_results_page(bing_api_results,
                                        'BingAPISearchV5()',
