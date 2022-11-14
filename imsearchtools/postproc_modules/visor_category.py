@@ -1,14 +1,13 @@
 #!/usr/bin/env python
 
 import os
-from socket import *
-from flask import json
-import zmq.green as zmq
-from time import sleep
+import socket
 import random
-
 import logging
 log = logging.getLogger(__name__)
+
+import zmq
+from flask import json
 
 TCP_TERMINATOR = "$$$"
 SUCCESS_FIELD = "success"
@@ -16,23 +15,14 @@ TCP_TIMEOUT = 86400.00
 
 def callback_func(out_dict, extra_prms=None):
     # connect to VISOR backend service
-    sock = socket(AF_INET, SOCK_STREAM)
+    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
     debug_cb_id = random.getrandbits(128)
     debug_cb_id = '%032x' % debug_cb_id
-    
+
     log.debug('VISOR CATEGORY: Connecting to backend (%s)...', debug_cb_id)
     sock.connect((extra_prms['backend_host'], extra_prms['backend_port']))
     log.debug('VISOR CATEGORY: Connected to backend (%s)', debug_cb_id)
-
-    # connect_attempts = 0
-    # while connect_attempts < 10:
-    #     try:
-    #         sock.connect((extra_prms['backend_host'], extra_prms['backend_port']))
-    #         connect_attempts = 100
-    #     except:
-    #         connect_attempts = connect_attempts + 1
-    #         sleep(0.001)
 
     sock.settimeout(TCP_TIMEOUT)
 
@@ -41,7 +31,7 @@ def callback_func(out_dict, extra_prms=None):
     (featfn, imext) = os.path.splitext(imfn)
     featfn += '.bin'
     featpath = os.path.join(extra_prms['featdir'], featfn)
-    extra_params=dict()
+    extra_params = dict()
     if 'detector' in extra_prms:
         extra_params['detector'] = extra_prms['detector']
     # construct VISOR backend function call
@@ -61,7 +51,7 @@ def callback_func(out_dict, extra_prms=None):
     total_sent = 0
     while total_sent < len(request):
         log.debug('VISOR CATEGORY: Sending request chunk (%s)...', debug_cb_id)
-        sent = sock.send(request[total_sent:])
+        sent = sock.send(request[total_sent:].encode())
         if sent == 0:
             raise RuntimeError("VISOR CATEGORY: Socket connection broken")
         total_sent = total_sent + sent
@@ -75,6 +65,7 @@ def callback_func(out_dict, extra_prms=None):
         try:
             log.debug('VISOR CATEGORY: Receiving response chunk (%s)...', debug_cb_id)
             rep_chunk = sock.recv(1024)
+            rep_chunk = rep_chunk.decode()
             if not rep_chunk:
                 log.error('VISOR CATEGORY: Connection closed! (%s)', debug_cb_id)
                 sock.close()
@@ -82,7 +73,7 @@ def callback_func(out_dict, extra_prms=None):
                 break
             response = response + rep_chunk
             term_idx = response.find(TCP_TERMINATOR)
-        except timeout:
+        except socket.timeout:
             log.error('VISOR CATEGORY: Socket timeout! (%s)', debug_cb_id)
             sock.close()
             log.debug('VISOR CATEGORY: Closed socket (%s)', debug_cb_id)
@@ -115,8 +106,8 @@ def callback_func(out_dict, extra_prms=None):
                 log.info('VISOR CATEGORY: Reusing ZMQ_SOCKET')
                 impath_sender = extra_prms['zmq_impath_return_sock']
 
-            impath_sender.send(str(out_dict['clean_fn']))
-            impath_sender.recv()
+            impath_sender.send_string(str(out_dict['clean_fn']))
+            impath_sender.recv_string()
             log.info('VISOR CATEGORY: Completed request')
 
         finally:

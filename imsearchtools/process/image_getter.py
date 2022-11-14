@@ -7,25 +7,22 @@ Author: Ken Chatfield <ken@robots.ox.ac.uk>
 Created on: 19 Oct 2012
 """
 
+import shutil
+import os
+import time
+import logging
+from http.client import BadStatusLine
+import requests
+
 import gevent
 from gevent.timeout import Timeout
-
-from gevent import monkey; monkey.patch_socket()
-import urllib.error
-import urllib.request
-from http.client import BadStatusLine
-
-#import requests
-import os
-import urllib.parse
-import time
+from gevent import monkey
+monkey.patch_socket()
 
 from .image_processor import *
-import imutils
-
-import logging
-
-from .callback_handler import CallbackHandler
+from . import imutils
+from imsearchtools.process import callback_handler
+#from callback_handler import CallbackHandler
 
 #logging.basicConfig(level=logging.INFO)
 log = logging.getLogger(__name__)
@@ -45,7 +42,6 @@ class ImageGetter(ImageProcessor):
         self.opts = opts
         self.timeout = timeout
         self.image_timeout = image_timeout
-        self.headers = {'User-Agent': 'Mozilla/5.0'}
         self.subprocs = []
 
     def process_url(self, urldata, output_dir, call_completion_func=False,
@@ -59,10 +55,10 @@ class ImageGetter(ImageProcessor):
             else:
                 clean_fn = None
                 thumb_fn = None
-        except urllib.error.URLError as e:
-            log.info('URL Error for %s (%s)', urldata['url'], str(e))
+        except requests.ConnectionError as e:
+            log.info('Connection Error for %s (%s)', urldata['url'], str(e))
             error_occurred = True
-        except urllib.error.HTTPError as e:
+        except requests.HTTPError as e:
             if e.code != 201:
                 log.info('HTTP Error for %s (%s)', urldata['url'], str(e))
                 error_occurred = True
@@ -106,16 +102,18 @@ class ImageGetter(ImageProcessor):
             return
 
         log.info('Downloading URL: %s', url)
-        request = urllib.request.Request(url, headers=self.headers)
-        r = None
+        response = None
         try:
-            r = urllib.request.urlopen(request, timeout=self.image_timeout)
+            response = requests.get(url, timeout=self.image_timeout, stream=True, verify=False)
         except Exception as e:
-            log.info('Exception while downloading URL: %s', str(e))
-            r = None
-        if r:
-            with open(output_fn, 'w') as f:
-                f.write(r.read())
+            log.info('Exception while downloading from %s: %s' % (url, str(e)))
+            response = None
+        if response:
+            try:
+                with open(output_fn, 'wb') as out_file:
+                    shutil.copyfileobj(response.raw, out_file)
+            except Exception as e:
+                log.info('Exception while saving %s: %s' % (output_fn, str(e)))
 
     def process_urls(self, urls, output_dir, completion_func=None,
                      completion_worker_count=-1, completion_extra_prms=None, process_images=True):
@@ -148,7 +146,7 @@ class ImageGetter(ImageProcessor):
         # prepare workers for callback if using callback function
         # returned process will end once all callbacks have been completed
         if completion_func:
-            self._callback_handler = CallbackHandler(completion_func,
+            self._callback_handler = callback_handler.CallbackHandler(completion_func,
                                                      len(urls),
                                                      completion_worker_count)
 
@@ -156,7 +154,7 @@ class ImageGetter(ImageProcessor):
         jobs = [gevent.spawn(self.process_url,
                              urldata, output_dir,
                              call_completion_func=(completion_func is not None),
-                             completion_extra_prms=completion_extra_prms,process_images=process_images,
+                             completion_extra_prms=completion_extra_prms, process_images=process_images,
                              start_time=time.time())
                 for urldata in urls]
 
@@ -175,6 +173,8 @@ class ImageGetter(ImageProcessor):
                 except (Timeout, IndexError):
                     job.kill(block=True)
                     timeout_occurred = True
+                except Exception:
+                    job.kill(block=True)
 
             # only wait for callback handler if timeout didn't occur
             # (as timeout will cause uncompleted gevent jobs to be forcibly ended

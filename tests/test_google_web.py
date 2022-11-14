@@ -1,12 +1,11 @@
 import os
 import sys
-
-file_dir = os.path.dirname(os.path.realpath(__file__))
-sys.path.append(os.path.join(file_dir, '..', '..', 'imsearch-tools'))
-from imsearchtools import query as image_query
-
 import requests
 import re
+
+FILE_DIR = os.path.dirname(os.path.realpath(__file__))
+sys.path.append(os.path.join(FILE_DIR, '..'))
+from imsearchtools.engines import google_web as image_query
 
 class TestGoogleWeb(object):
 
@@ -72,6 +71,7 @@ class TestGoogleWeb(object):
                     break
             assert found
         print ("URLs are the same")
+
 
 test = TestGoogleWeb()
 test.setup()

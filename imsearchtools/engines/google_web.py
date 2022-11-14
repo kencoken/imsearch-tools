@@ -1,11 +1,9 @@
 #!/usr/bin/env python
 
-import requests
-import re
 import math
 from hashlib import md5
-
-from .search_client import *
+import requests
+from .search_client import SearchClient
 
 ## Engine Configuration
 #  --------------------------------------------
@@ -17,7 +15,8 @@ GOOGLE_WEB_FUNC = 'search'
 #  --------------------------------------------
 
 class GoogleWebSearch(requests.Session, SearchClient):
-    """Wrapper class for Google Image Search using web interface.
+    """
+    Wrapper class for Google Image Search using web interface.
     See https://www.google.com/advanced_image_search
 
     This class does not use any API, but instead extracts results directly from the
@@ -42,7 +41,6 @@ class GoogleWebSearch(requests.Session, SearchClient):
         self.async_query = async_query
         self.acceptable_extensions = { "jpg", "jpeg", "png", "JPG", "JPEG", "PNG" }
 
-
     def _fetch_results_from_offset(self, query, result_offset,
                                    aux_params={}, headers={},
                                    num_results=-1):
@@ -56,8 +54,15 @@ class GoogleWebSearch(requests.Session, SearchClient):
             aux_params['as_q'] = query
             aux_params['ijn'] = page_idx  # ijn is the AJAX page index (0 = first page)
 
+            # When making a google search we are redirected to a page
+            # to give tracking consent.  Maybe we should give the
+            # consent properly and get back a cookie but apparently we
+            # can hack it with a 'CONSENT' cookie set to 'YES+' (see
+            # https://gitlab.com/vgg/vgg_frontend/-/issues/28 and
+            # https://stackoverflow.com/questions/70560247/)
             resp = self.get(GOOGLE_WEB_ENTRY + GOOGLE_WEB_FUNC,
-                            params=aux_params, headers=headers)
+                            params=aux_params, headers=headers,
+                            cookies={'CONSENT' : 'YES+'})
             resp_str = resp.text
 
             html = resp_str.split('["')
@@ -80,13 +85,12 @@ class GoogleWebSearch(requests.Session, SearchClient):
 
             # package for output
             resp_dict = [{'url': item[0],
-                          'image_id': md5(item[1]).hexdigest(),
+                          'image_id': md5( item[1].encode('utf-8') ).hexdigest(),
                           'rank': result_offset+index+1} for index, item in enumerate(image_data)]
 
             return resp_dict
         except requests.exceptions.RequestException:
             return []
-
 
     def query(self, query, size='medium', style='photo', num_results=100):
         # prepare query parameters
