@@ -1,2 +1,2 @@
 #!/bin/bash
-python imsearch_http_service.py 36213
+python -m imsearchtools.http_service 36213

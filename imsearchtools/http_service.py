@@ -8,7 +8,7 @@ logging.basicConfig(format='%(asctime)s %(levelname)s:%(message)s', level=loggin
 from flask import Flask, request, Response
 from flask import json
 from gevent.pywsgi import WSGIServer
-from imsearchtools import http_service_helper
+from . import http_service_helper
 
 DEFAULT_SERVER_PORT = 8157
 SUPPORTED_ENGINES = ['bing_api', 'google_api', 'google_web', 'flickr_api']

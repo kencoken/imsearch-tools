@@ -10,10 +10,10 @@ fi
 
 cd ../
 
-until python imsearch_http_service.py "$@" 1>&1 2> >(tee -a $STDERR_LOG >&2); do
+until python -m imsearchtools.http_service "$@" 1>&1 2> >(tee -a $STDERR_LOG >&2); do
     echo "$@"
     ERR_CODE=$?
-    echo "Server './imsearch_http_service.py' crashed with exit code $ERR_CODE.  Respawning..." >&2
+    echo "Server 'imsearchtools.http_service' crashed with exit code $ERR_CODE.  Respawning..." >&2
 
     now=$(date "+%Y-%m-%d %H:%M:%S")
     echo "$now: Exited with code $ERR_CODE " >> $CRASH_LOG

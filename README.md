@@ -181,10 +181,10 @@ process via TCP/IP / pipes / ZMQ etc. to launch the code.
 HTTP Service
 ------------
 
-A simple HTTP interface to the library is provided by `imsearch_http_service.py` and
+A simple HTTP interface to the library is provided by `imsearchtools.http_service` and
 can be launched by calling:
 
-    python imsearch_http_service.py
+    python -m imsearchtools.http_service
 
 For basic usage, the following function calls are provided:
 
