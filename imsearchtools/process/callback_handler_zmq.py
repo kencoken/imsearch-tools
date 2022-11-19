@@ -7,7 +7,7 @@ Created on: 20 Oct 2012
 """
 
 import logging
-from gevent_zeromq import zmq
+import zmq
 import random
 
 class ProcType:

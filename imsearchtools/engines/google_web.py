@@ -1,29 +1,26 @@
 #!/usr/bin/env python
 
-import requests
-import re
 import math
 from hashlib import md5
+import requests
+from .search_client import SearchClient
 
-from .search_client import *
-from .api_credentials import *
-
-## API Configuration
+## Engine Configuration
 #  --------------------------------------------
 
-GOOGLE_WEB_ENTRY = 'http://www.google.com/'
+GOOGLE_WEB_ENTRY = 'https://www.google.com/'
 GOOGLE_WEB_FUNC = 'search'
 
 ## Search Class
 #  --------------------------------------------
 
 class GoogleWebSearch(requests.Session, SearchClient):
-    """Wrapper class for Google Image Search using web interface.
+    """
+    Wrapper class for Google Image Search using web interface.
+    See https://www.google.com/advanced_image_search
 
     This class does not use any API, but instead extracts results directly from the
-    web search pages (acting as Firefox v25.0).
-
-    Created November 2013.
+    web search pages (acting as Firefox).
     """
 
     def __init__(self, async_query=True, timeout=5.0, **kwargs):
@@ -37,21 +34,16 @@ class GoogleWebSearch(requests.Session, SearchClient):
                                      'medium': 'm',
                                      'large': 'l'}
         self._supported_styles_map = {'photo': 'photo',
-                                      'graphics': 'clipart',
                                       'clipart': 'clipart',
                                       'lineart': 'lineart',
-                                      'face': 'face'}
+                                      'face': 'face',
+                                      'animated': 'animated'}
         self.async_query = async_query
+        self.acceptable_extensions = { "jpg", "jpeg", "png", "JPG", "JPEG", "PNG" }
 
     def _fetch_results_from_offset(self, query, result_offset,
                                    aux_params={}, headers={},
                                    num_results=-1):
-        #if num_results == -1:
-        #    num_results = self._results_per_req
-        image_div_pattern = re.compile(r'<div class="rg_meta(.*?)</div>')
-        image_url_pattern = re.compile(r'"ou":"(.*?)"')
-        image_id_pattern = re.compile(r'id":"(.*?):')
-        #image_id_pattern = re.compile(r'name="(.*?):')
 
         try:
             page_idx = int(math.floor(result_offset/float(self._results_per_req)))
@@ -59,22 +51,28 @@ class GoogleWebSearch(requests.Session, SearchClient):
             page_offset = result_offset - page_start
 
             # add query position to auxilary parameters
-            aux_params['q'] = query
+            aux_params['as_q'] = query
             aux_params['ijn'] = page_idx  # ijn is the AJAX page index (0 = first page)
-            #aux_params['start'] = page_idx*self._results_per_req # apparently not necessary
 
+            # When making a google search we are redirected to a page
+            # to give tracking consent.  Maybe we should give the
+            # consent properly and get back a cookie but apparently we
+            # can hack it with a 'CONSENT' cookie set to 'YES+' (see
+            # https://gitlab.com/vgg/vgg_frontend/-/issues/28 and
+            # https://stackoverflow.com/questions/70560247/)
             resp = self.get(GOOGLE_WEB_ENTRY + GOOGLE_WEB_FUNC,
-                            params=aux_params, headers=headers)
+                            params=aux_params, headers=headers,
+                            cookies={'CONSENT' : 'YES+'})
             resp_str = resp.text
 
-            image_divs = image_div_pattern.findall(resp_str)
+            html = resp_str.split('["')
             image_data = []
-            for div in image_divs:
-                image_url_match = image_url_pattern.search(div)
-                image_id_match = image_id_pattern.search(div)
-                if image_url_match and image_id_match:
-                    image_data.append((image_url_match.group(1),
-                                       image_id_match.group(1)))
+            for item in html:
+                if item.startswith('http') and item.split('"')[0].split('.')[-1] in self.acceptable_extensions:
+                    url = item.split('"')[0]
+                    name = url.rsplit('/', 1)[-1]
+                    if url and name:
+                        image_data.append((url, name))
 
             # modify returned results list according to input params
             # (if necessary)
@@ -87,7 +85,7 @@ class GoogleWebSearch(requests.Session, SearchClient):
 
             # package for output
             resp_dict = [{'url': item[0],
-                          'image_id': md5(item[1]).hexdigest(),
+                          'image_id': md5( item[1].encode('utf-8') ).hexdigest(),
                           'rank': result_offset+index+1} for index, item in enumerate(image_data)]
 
             return resp_dict
@@ -100,22 +98,17 @@ class GoogleWebSearch(requests.Session, SearchClient):
         style = self._style_to_native_style(style)
 
         # prepare auxilary parameters (contained in tbs)
-        tbs_list = []
+        aux_params = {}
         if size:
-            tbs_list.append('isz:%s' % size)
+            aux_params['imgsz'] = size
         if style:
-            tbs_list.append('itp:%s' % style)
-
-        tbs_str = ','.join(tbs_list)
+            aux_params['imgtype'] = style
 
         # prepare shared parameters
-        aux_params = {}
         aux_params['tbm'] = 'isch' #image search mode
         aux_params['ijn'] = 0      # causes AJAX request contents only to be returned
-        if tbs_str:
-            aux_params['tbs'] = tbs_str
 
-        headers = {'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.8; rv:25.0) Gecko/20100101 Firefox/25.0'}
+        headers = {'User-Agent': 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:58.0) Gecko/20100101 Firefox/58.0'}
 
         # do request
         results = self._fetch_results(query,

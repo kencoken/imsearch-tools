@@ -18,7 +18,8 @@ GOOGLE_API_FUNC = 'v1'
 class GoogleAPISearch(requests.Session, SearchClient):
     """Wrapper class for Google Custom Search API (for images). For more details see:
     https://developers.google.com/custom-search/v1/overview/
-
+    https://developers.google.com/custom-search/json-api/v1/reference/cse/list
+    
     ** NOTE: This updated API only offers search over 'custom search engines' for which
        URLs of specific websites must be specified, although there is an option in the
        control panel to search 'the entire web, preferring listed websites' - apparently
@@ -39,7 +40,6 @@ class GoogleAPISearch(requests.Session, SearchClient):
                                      'medium': 'large',
                                      'large': 'xxlarge'}
         self._supported_styles_map = {'photo': 'photo',
-                                      'graphics': 'clipart',
                                       'clipart': 'clipart',
                                       'lineart': 'lineart',
                                       'face': 'face',

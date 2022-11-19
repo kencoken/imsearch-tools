@@ -12,7 +12,8 @@ class NoAPICredentials(Exception):
 #  --------------------------------------------
 
 class SearchClient(object):
-    """Base class for all search clients, providing utility methods common
+    """
+    Base class for all search clients, providing utility methods common
     to all classes. Requires the subclass to define the following:
 
     PROPERTIES:
@@ -48,17 +49,21 @@ class SearchClient(object):
         if size == '':
             return size
         if size not in self._supported_sizes_map:
-            raise ValueError("Unsupported size '%s'" % size)
-        else:
-            return self._supported_sizes_map[size]
+            # do not completely abort because of this
+            print ("**** WARNING: Unsupported size '%s'. Ignoring value. ****" % size)
+            return ''
+
+        return self._supported_sizes_map[size]
 
     def _style_to_native_style(self, style):
         if style == '':
             return style
         if style not in self._supported_styles_map:
-            raise ValueError("Unsupported style '%s'" % style)
-        else:
-            return self._supported_styles_map[style]
+            # do not completely abort because of this
+            print ("**** WARNING: Unsupported style '%s'. Ignoring value. ****" % style)
+            return ''
+
+        return self._supported_styles_map[style]
 
     def _fetch_results(self, query, num_results,
                        aux_params={},

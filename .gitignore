@@ -2,3 +2,4 @@ demos/
 static/
 venv/
 *.pyc
+demos/*.html

@@ -22,18 +22,18 @@ DEBUG_MESSAGES = False
 ## Search Class
 #  --------------------------------------------
 
-class BingAPISearch(requests.Session, SearchClient):
+class BingAPISearchV1(requests.Session, SearchClient):
     """Wrapper class for Bing Image Search API. For more details see:
     http://www.bing.com/developers/
     """
 
     def __init__(self, async_query=True, timeout=5.0, **kwargs):
-        super(BingAPISearch, self).__init__()
+        super(BingAPISearchV1, self).__init__()
 
-        if not BING_API_KEY:
+        if not BING_API_KEY_V1:
             raise NoAPICredentials('API Credentials must be specified in imsearch/engines/api_credentials.py')
-
-        self.auth = ('', BING_API_KEY)
+        
+        self.auth = ('', BING_API_KEY_V1)
         self.headers.update(kwargs)
         self.timeout = timeout
 

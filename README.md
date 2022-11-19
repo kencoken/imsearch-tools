@@ -5,10 +5,13 @@ Authors:
 
  + Ken Chatfield, University of Oxford – <ken@robots.ox.ac.uk>
  + Kevin McGuinness, Dublin City University – <kevin.mcguinness@eeng.dcu.ie>
+ + Ernesto Coto - <ecoto@robots.ox.ac.uk>
 
-Copyright 2010-2015, all rights reserved.
+Copyright 2010-2016, all rights reserved.
 
-Release: v1.2.3 (October 2015)
+Last release: v1.2.3 (October 2015). See the original repository of the Image Search Tool at <https://github.com/kencoken/imsearch-tools>.
+
+This is a forked repository introducing new changes.
 
 License: MIT (see LICENSE.md)
 
@@ -54,15 +57,20 @@ Currently the following search services are supported:
      - Details and authentication key available at:
        <https://developers.google.com/custom-search/v1/overview/>
  + **GoogleOldAPISearch ( )** – Image search using Google, using the *Google Image Search API*
-     - The *Google Image Search API* is now deprecated
+     - **The *Google Image Search API* is now deprecated**
      - A limit of 64 images per search is imposed
      - There is a higher default limit on number of free requests/day than with the
        new API
      - Details and authentication key available at:
        <https://developers.google.com/image-search/>
- + **BingAPISearch ( )** – Image search using Bing, using the *Bing Search API*
+ + **BingAPISearchV1 ( )** – Image search using Bing, using the *Bing Search API V1*
+     - **The *Bing Search API V1* is now deprecated**
      - Details and authentication key available at:
        <http://www.bing.com/developers/>
+ + **BingAPISearchV5 ( )** – Image search using Bing, using the *Bing Search API V5*
+     - Authentication key available at: <https://www.microsoft.com/cognitive-services/en-us/subscriptions>
+     - Image Search API Reference at: <https://msdn.microsoft.com/en-us/library/dn760791(v=bsynd.50).aspx>
+     - API Testing Console at: <https://dev.cognitive.microsoft.com/docs/services/56b43f0ccf5ff8098cef3808/operations/571fab09dbe2d933e891028f>
  + **FlickrAPISearch ( )** – Image search using Flickr, using the *Flickr API*
      - Provides text search of Flickr photos by associated tags
      - Details and authentication key available at:
@@ -173,10 +181,10 @@ process via TCP/IP / pipes / ZMQ etc. to launch the code.
 HTTP Service
 ------------
 
-A simple HTTP interface to the library is provided by `imsearch_http_service.py` and
+A simple HTTP interface to the library is provided by `imsearchtools.http_service` and
 can be launched by calling:
 
-    python imsearch_http_service.py
+    python -m imsearchtools.http_service
 
 For basic usage, the following function calls are provided:
 
@@ -241,6 +249,21 @@ example in `example_textlog_module.py` for the required format of the module fil
 Revision History
 ----------------
 
+ + *Dec 2016*
+     - Other minor modifications.
+     - Updated the Flickr API access point and query style. This engine is back to work.
+     - Added a new engine for the new BING API (v5)
+     - Deprecated the previous version of the BING API (v1)
+ + *Aug-Nov 2016*
+     - EC taking over responsability to fix this code
+     - Fixed google web engine to work with updated Google search page
+     - Fixed test for google web engine
+     - Fixes on supported styles map
+     - Replaced exceptions with warnings when an unsupported size/style is specified,
+       allowing the default values to be used instead
+     - Improved logging of the postprocessing modules
+     - Improved some comments and readmes
+     - Replaced invalid, old, API credentials
  + *Oct 2015* (1.2.3)
      - Cleaning up, demonstrate querying for variable number of images
  + *Apr 2015* (1.2.2)

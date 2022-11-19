@@ -1,10 +1,11 @@
 #!/usr/bin/env python
 
 import os
+import importlib
 
 def get_module_callback(module_name):
     try:
-        module = __import__(module_name, globals=globals())
+        module = importlib.import_module('.'+module_name, 'imsearchtools.postproc_modules')
         callback_func = module.callback_func
     except ImportError as err:
         avail_modules = get_module_list()

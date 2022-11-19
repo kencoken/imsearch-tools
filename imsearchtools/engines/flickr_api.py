@@ -16,14 +16,19 @@ FLICKR_API_METHOD = 'flickr.photos.search'
 #  --------------------------------------------
 
 class FlickrAPISearch(requests.Session, SearchClient):
-    """Wrapper class for Flickr API. For more details see:
+    """
+    Wrapper class for Flickr API. For more details see:
     http://www.flickr.com/services/api/
+    For a reference use the Explorer:
+    https://www.flickr.com/services/api/explore/flickr.photos.search
+    For help and bus reports try:
+    https://www.flickr.com/help/forum/
     """
 
     def __init__(self, async_query=True, timeout=5.0, **kwargs):
         super(FlickrAPISearch, self).__init__()
 
-        if not FLICKR_API_KEY:
+        if not FLICKR_API_KEY: #or not FLICKR_API_SECRET: The API secret is not needed unless the request is signed. Keep it secret until really needed.
             raise NoAPICredentials('API Credentials must be specified in imsearch/engines/api_credentials.py')
 
         self.headers.update(kwargs)
@@ -56,9 +61,12 @@ class FlickrAPISearch(requests.Session, SearchClient):
             aux_params['per_page'] = self._results_per_req
             aux_params['page'] = page_num
 
-            resp = self.get(FLICKR_API_ENTRY,
-                            params=aux_params,
-                            headers=headers)
+            full_url = FLICKR_API_ENTRY + '?'
+            for key,value in aux_params.iteritems():
+                full_url = full_url + key + '=' + str(value) + '&'
+            full_url = full_url[: len(full_url)-1] # remove last '&'
+
+            resp = self.get(full_url) # This only works with the full URL. It no longer works specifying the parameters in a separate variable.
             resp.raise_for_status()
 
             # extract list of results from response
@@ -81,7 +89,7 @@ class FlickrAPISearch(requests.Session, SearchClient):
                  'image_id': md5(item['id']).hexdigest(),
                  'title': item['title']} for item in results]
 
-    def query(self, query, size='medium', num_results=100):
+    def query(self, query, size='medium', style='photo', num_results=100):
         # prepare query parameters
         size = self._size_to_native_size(size)
 
@@ -91,7 +99,7 @@ class FlickrAPISearch(requests.Session, SearchClient):
                       'format': 'json',
                       'nojsoncallback': 1,
                       'sort': 'relevance',
-                      'content_type': 1} # just photos
+                      'content_type': 1} # just photos, 'style' parameter would be ignored
 
         # do request
         results = self._fetch_results(query,
