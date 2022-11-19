@@ -16,7 +16,7 @@ class TestBingAPI(object):
 
     def test_query(self):
         res = self._gws.query(self._q, num_results=10)
-        print res
+        print(res)
 
     def test_images_returned(self):
         res = self._gws.query(self._q, num_results=100)
